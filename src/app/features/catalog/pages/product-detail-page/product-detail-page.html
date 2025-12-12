@@ -1,0 +1,46 @@
+<section class="space-y-4">
+  <a routerLink="/" class="text-sm text-slate-600 hover:underline">
+    ← Volver al catálogo
+  </a>
+
+  <div class="grid gap-6 md:grid-cols-2">
+    <!-- Imagen -->
+    <div class="flex items-center justify-center rounded-xl bg-slate-100 p-4">
+      <img
+        src="https://via.placeholder.com/400x400.png?text=Producto"
+        alt="Producto"
+        class="max-h-96 object-contain"
+      />
+    </div>
+
+    <!-- Detalle -->
+    <div class="space-y-3">
+      <h1 class="text-2xl font-semibold text-slate-900">
+        Nombre del producto
+      </h1>
+      <p class="text-sm text-slate-600">
+        Categoría: <span class="font-medium">Ejemplo</span>
+      </p>
+
+      <div class="flex items-center gap-3">
+        <span class="text-2xl font-bold text-slate-900">
+          {{ 99.99 | currency : 'USD' }}
+        </span>
+        <span class="text-sm text-amber-600">
+          ★★★★☆ (4.5)
+        </span>
+      </div>
+
+      <p class="text-sm text-slate-700">
+        Aquí irá la descripción completa del producto obtenida de la API.
+      </p>
+
+      <button
+        type="button"
+        class="mt-4 inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+      >
+        Añadir al carrito
+      </button>
+    </div>
+  </div>
+</section>

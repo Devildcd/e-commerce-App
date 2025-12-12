@@ -1,0 +1,45 @@
+<header class="bg-white shadow-sm">
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+    <!-- Logo -->
+    <a routerLink="/" class="flex items-center gap-2">
+      <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white font-bold">
+        E
+      </span>
+      <span class="font-semibold text-lg">E-commerce App</span>
+    </a>
+
+    <!-- Search (luego será form reactivo) -->
+    <form class="hidden md:flex flex-1 max-w-md items-center gap-2">
+      <input
+        type="text"
+        placeholder="Buscar productos..."
+        class="flex-1 rounded-md border border-slate-300 px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/50"
+      />
+      <button
+        type="submit"
+        class="rounded-md bg-slate-900 px-3 py-1 text-sm font-medium text-white hover:bg-slate-800"
+      >
+        Buscar
+      </button>
+    </form>
+
+    <!-- Acciones: carrito + auth -->
+    <div class="flex items-center gap-4">
+      <!-- Carrito -->
+      <a routerLink="/cart" class="relative inline-flex items-center gap-1 text-sm">
+        <span class="material-symbols-outlined text-xl">shopping_cart</span>
+        <span>Carrito</span>
+        <span
+          class="absolute -top-2 -right-3 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 px-1 text-[0.7rem] font-semibold text-white"
+        >
+          2
+        </span>
+      </a>
+
+      <!-- Auth -->
+      <a routerLink="/auth" class="text-sm font-medium text-slate-700 hover:text-slate-900">
+        Iniciar sesión
+      </a>
+    </div>
+  </div>
+</header>
