@@ -3,11 +3,12 @@ import {
   withState,
   withComputed,
   withMethods,
+  patchState,
 } from '@ngrx/signals';
 
 export type Theme = 'light' | 'dark' | 'system';
 
-export type NotificationKind = 'success' | 'error' | 'info';
+export type NotificationKind = 'success' | 'error' | 'info' | 'warning';
 
 export interface UiNotification {
   id: string;
@@ -18,34 +19,38 @@ export interface UiNotification {
 export interface UiState {
   theme: Theme;
   notifications: UiNotification[];
-  sidebarOpen: boolean;
 }
 
 const initialState: UiState = {
   theme: 'light',
   notifications: [],
-  sidebarOpen: false,
 };
+
+function createId(): string {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
 
 export const UiStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
 
-  withMethods((store) => ({
+ withMethods((store) => ({
     setTheme(theme: Theme): void {
-      // TODO
+      patchState(store, { theme });
     },
 
-    addNotification(notification: UiNotification): void {
-      // TODO
+    addNotification(notification: Omit<UiNotification, 'id'>): void {
+      const id = createId();
+      const next = [...store.notifications(), { ...notification, id }];
+      patchState(store, { notifications: next });
     },
 
     dismissNotification(id: string): void {
-      // TODO
+      const next = store
+        .notifications()
+        .filter((notification) => notification.id !== id);
+      patchState(store, { notifications: next });
     },
 
-    toggleSidebar(): void {
-      // TODO
-    },
   }))
 );

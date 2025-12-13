@@ -4,16 +4,22 @@ import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 
 export interface ApiRequestOptions {
-  headers?: | HttpHeaders | { [key: string]: string | string[] };
-  params?: | HttpParams |  {
+  headers?:
+    | HttpHeaders
+    | {
+        [key: string]: string | string[];
+      };
+  params?:
+    | HttpParams
+    | {
         [param: string]:
           | string
           | number
           | boolean
           | ReadonlyArray<string | number | boolean>;
       };
-  withCredencials?: boolean;
-  context?: HttpContext
+  withCredentials?: boolean;
+  context?: HttpContext;
 }
 
 // Servicio centralizado para manejar la urlBase, usar T para HttpClient, headers
