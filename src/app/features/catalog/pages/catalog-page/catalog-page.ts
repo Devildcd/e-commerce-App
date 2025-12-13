@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 
 import { ProductCard } from '../../components/product-card/product-card';
 import { CategoriesSection } from '../../components/categories-section/categories-section';
+import { CatalogStore } from '../../../../core/state/catalog-store';
 
 
 @Component({
@@ -12,11 +13,18 @@ import { CategoriesSection } from '../../components/categories-section/categorie
 })
 export class CatalogPage {
 
-  products = Array.from({ length: 8 }).map((_, index) => ({
-    id: index + 1,
-    title: `Producto ${index + 1}`,
-    description: 'Descripción de ejemplo del producto.',
-    price: 49.99 + index,
-    image: `https://placehold.co/300x300.png?text=Producto+${index + 1}`,
-  }));
+  private readonly catalogStore = inject(CatalogStore);
+
+  readonly products = this.catalogStore.filteredProducts;
+  readonly status = this.catalogStore.status;
+
+  ngOnInit(): void {
+    if (this.status() === 'idle') {
+      this.catalogStore.loadCatalog();
+    }
+  }
+
+  onRetry(): void {
+    this.catalogStore.loadCatalog();
+  }
 }

@@ -1,5 +1,5 @@
 import { computed } from "@angular/core";
-import { signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
+import { patchState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
 
 export interface CartItemState {
   productId: number;
@@ -20,33 +20,73 @@ export const CartStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
 
-  withComputed(({ items }) => ({
+  withComputed((store) => ({
     totalItems: computed(() =>
-      items().reduce((acc, item) => acc + item.quantity, 0)
+      store.items().reduce((total, item) => total + item.quantity, 0)
     ),
+
     totalAmount: computed(() =>
-      items().reduce(
-        (acc, item) => acc + item.quantity * item.unitPrice,
+      store.items().reduce(
+        (total, item) => total + item.quantity * item.unitPrice,
         0
       )
     ),
+
+    isEmpty: computed(() => store.items().length === 0),
   })),
 
   withMethods((store) => ({
-    addItem(item: CartItemState): void {
-      // TODO: añadir o incrementar cantidad
+    addItem(payload: CartItemState): void {
+      const current = store.items();
+      const index = current.findIndex(
+        (item) => item.productId === payload.productId
+      );
+
+      let next: CartItemState[];
+
+      if (index === -1) {
+        const quantity = payload.quantity > 0 ? payload.quantity : 1;
+        next = [...current, { ...payload, quantity }];
+      } else {
+        next = current.map((item, i) =>
+          i === index
+            ? {
+                ...item,
+                quantity: item.quantity + (payload.quantity || 1),
+              }
+            : item
+        );
+      }
+
+      patchState(store, { items: next });
     },
 
     removeItem(productId: number): void {
-      // TODO
+      const next = store
+        .items()
+        .filter((item) => item.productId !== productId);
+
+      patchState(store, { items: next });
     },
 
     updateQuantity(productId: number, quantity: number): void {
-      // TODO
+      if (quantity <= 0) {
+        const next = store
+          .items()
+          .filter((item) => item.productId !== productId);
+        patchState(store, { items: next });
+        return;
+      }
+
+      const next = store.items().map((item) =>
+        item.productId === productId ? { ...item, quantity } : item
+      );
+
+      patchState(store, { items: next });
     },
 
-    clearCart(): void {
-      // TODO
+    clear(): void {
+      patchState(store, { items: [] });
     },
   }))
 );

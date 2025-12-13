@@ -2,10 +2,10 @@
   <div class="px-4 py-3">
     <div class="strip-scroll overflow-x-auto py-1 md:overflow-x-visible">
       <div class="mx-auto flex w-max justify-center gap-6">
-        @for (c of categories; track c.id) {
+        @for (c of categories(); track c.id) {
           <button
             type="button"
-            (click)="activeId.set(c.id)"
+            (click)="onCategoryClick(c.id)"
             class="group flex w-[78px] shrink-0 flex-col items-center gap-2"
             [attr.aria-pressed]="activeId() === c.id"
           >

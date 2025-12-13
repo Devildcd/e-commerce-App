@@ -34,7 +34,7 @@
 
   <!-- Grid -->
   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    @for (p of products; track p.id) {
+    @for (p of products(); track p.id) {
       <app-product-card
         [title]="p.title"
         [description]="p.description"
