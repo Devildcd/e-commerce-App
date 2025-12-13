@@ -1,0 +1,41 @@
+.category-strip {
+  position: relative;
+
+  // fade en bordes para sugerir scroll
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 28px;
+    height: 100%;
+    pointer-events: none;
+  }
+ 
+}
+
+.strip-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.strip-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Seleccionado: pop + glow sutil */
+.category-active {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.15),
+    0 10px 24px rgba(15, 23, 42, 0.18);
+  animation: catPop 220ms ease-out;
+}
+
+@keyframes catPop {
+  from {
+    transform: translateY(0) scale(0.98);
+  }
+  to {
+    transform: translateY(-2px) scale(1.04);
+  }
+}

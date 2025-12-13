@@ -1,91 +1,161 @@
-<section class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-  <!-- Lista de items -->
-  <div class="space-y-4">
-    <h1 class="text-2xl font-semibold text-slate-900">
-      Carrito
-    </h1>
+<section class="mx-auto max-w-6xl px-4 py-6">
+  <!-- Header superior alineado -->
+  <header class="mb-4 flex items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-medium uppercase tracking-wider text-slate-500">Cart</p>
+      <h1 class="mt-1 text-3xl font-semibold tracking-tight text-slate-900">Carrito</h1>
+    </div>
 
-    <div
-      class="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white"
-    >
-      <div
-        *ngFor="let item of items"
-        class="flex gap-4 p-4"
+    <div class="flex items-center gap-4">
+      <a
+        routerLink="/"
+        class="hidden sm:inline-flex text-sm text-slate-600 hover:text-slate-900 hover:underline"
       >
-        <div class="h-20 w-20 flex-shrink-0 rounded-lg bg-slate-100">
-          <img
-            [src]="item.image"
-            [alt]="item.title"
-            class="h-full w-full object-cover"
-          />
-        </div>
+        Seguir comprando →
+      </a>
 
-        <div class="flex flex-1 flex-col gap-1">
-          <p class="text-sm font-semibold text-slate-900">
-            {{ item.title }}
-          </p>
-          <p class="text-xs text-slate-600">
-            Precio: {{ item.price | currency : 'USD' }}
-          </p>
-
-          <div class="mt-2 flex items-center justify-between">
-            <div class="flex items-center gap-2 text-xs">
-              <span class="text-slate-600">Cantidad:</span>
-              <input
-                type="number"
-                min="1"
-                [value]="item.quantity"
-                class="w-16 rounded-md border border-slate-300 px-2 py-1 text-xs"
-              />
-            </div>
-
-            <button
-              type="button"
-              class="text-xs font-medium text-red-600 hover:text-red-700"
-            >
-              Quitar
-            </button>
-          </div>
-        </div>
+      <div class="hidden lg:flex items-center gap-2">
+        <span class="text-sm font-medium text-slate-600">Mi compra</span>
+        <span
+          class="inline-flex h-6 items-center rounded-full bg-slate-100 px-2 text-xs font-semibold text-slate-700 ring-1 ring-slate-200/60"
+        >
+          Resumen
+        </span>
       </div>
     </div>
+  </header>
 
-    <a
-      routerLink="/"
-      class="inline-flex text-sm text-slate-600 hover:underline"
-    >
-      ← Seguir comprando
-    </a>
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+    <!-- Lista -->
+    <div class="space-y-4">
+      <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/60">
+        <div class="divide-y divide-slate-100">
+          @for (item of items; track item.id) {
+            <div class="flex gap-4 p-4 sm:p-5">
+              <!-- Imagen -->
+              <div class="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100 ring-1 ring-slate-200/60">
+                <img
+                  [src]="item.image"
+                  [alt]="item.title"
+                  class="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+
+              <!-- Info -->
+              <div class="min-w-0 flex-1">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-semibold text-slate-900">
+                      {{ item.title }}
+                    </p>
+                    <p class="mt-1 text-xs text-slate-600">
+                      {{ item.price | currency : 'USD' }}
+                    </p>
+                  </div>
+
+                  <!-- Quitar -->
+                  <button
+                    type="button"
+                    class="inline-flex h-9 items-center gap-2 rounded-xl px-3 text-xs font-medium text-red-600 transition hover:bg-red-50 hover:text-red-700"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                    <span class="hidden sm:inline">Quitar</span>
+                  </button>
+                </div>
+
+                <!-- Cantidad + subtotal -->
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+                  <div class="inline-flex items-center rounded-xl bg-slate-50 ring-1 ring-slate-200/60">
+                    <button
+                      type="button"
+                      class="grid h-10 w-10 place-items-center rounded-l-xl text-slate-700 hover:bg-white"
+                      aria-label="Decrease"
+                    >
+                      <span class="material-symbols-outlined text-[18px]">remove</span>
+                    </button>
+
+                    <input
+                      type="number"
+                      min="1"
+                      [value]="item.quantity"
+                      class="h-10 w-14 bg-transparent text-center text-sm font-medium text-slate-900 outline-none"
+                    />
+
+                    <button
+                      type="button"
+                      class="grid h-10 w-10 place-items-center rounded-r-xl text-slate-700 hover:bg-white"
+                      aria-label="Increase"
+                    >
+                      <span class="material-symbols-outlined text-[18px]">add</span>
+                    </button>
+                  </div>
+
+                  <div class="text-sm font-semibold text-slate-900">
+                    {{ (item.price * item.quantity) | currency : 'USD' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="p-10 text-center">
+              <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-slate-100 ring-1 ring-slate-200">
+                <span class="material-symbols-outlined text-slate-500">shopping_cart</span>
+              </div>
+              <h3 class="mt-4 text-base font-semibold text-slate-900">Tu carrito está vacío</h3>
+              <p class="mt-1 text-sm text-slate-600">Agrega productos para verlos aquí.</p>
+
+              <a
+                routerLink="/"
+                class="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800"
+              >
+                Ver catálogo
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Seguir comprando (mobile) -->
+      <a routerLink="/" class="sm:hidden inline-flex text-sm text-slate-600 hover:underline">
+        ← Seguir comprando
+      </a>
+    </div>
+
+    <!-- Resumen -->
+    <aside class="h-fit space-y-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/60 lg:sticky lg:top-24">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Resumen</h2>
+        <span class="text-xs font-medium text-slate-500">3 items</span>
+      </div>
+
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between text-slate-600">
+          <span>Subtotal</span>
+          <span class="text-slate-900">{{ 119.97 | currency : 'USD' }}</span>
+        </div>
+
+        <div class="flex justify-between text-slate-600">
+          <span>Envío</span>
+          <span class="text-emerald-600 font-medium">Gratis</span>
+        </div>
+
+        <div class="border-t border-slate-200/70 pt-3 flex justify-between text-base font-semibold">
+          <span>Total</span>
+          <span>{{ 119.97 | currency : 'USD' }}</span>
+        </div>
+      </div>
+
+      <a
+        routerLink="/checkout"
+        class="inline-flex h-11 w-full items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800"
+      >
+        Ir a checkout
+      </a>
+
+      <p class="text-xs text-slate-500">
+        * Impuestos incluidos. Envío gratis por tiempo limitado.
+      </p>
+    </aside>
   </div>
-
-  <!-- Resumen -->
-  <aside
-    class="space-y-4 rounded-xl border border-slate-200 bg-white p-4 h-fit"
-  >
-    <h2 class="text-lg font-semibold text-slate-900">
-      Resumen
-    </h2>
-
-    <div class="flex justify-between text-sm">
-      <span>Subtotal</span>
-      <span>{{ 119.97 | currency : 'USD' }}</span>
-    </div>
-
-    <div class="flex justify-between text-sm">
-      <span>Envío</span>
-      <span>Gratis</span>
-    </div>
-
-    <div class="border-t border-slate-200 pt-3 flex justify-between font-semibold">
-      <span>Total</span>
-      <span>{{ 119.97 | currency : 'USD' }}</span>
-    </div>
-
-    <a
-      routerLink="/checkout"
-      class="mt-3 inline-flex w-full items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-    >
-      Ir a checkout
-    </a>
-  </aside>
 </section>
