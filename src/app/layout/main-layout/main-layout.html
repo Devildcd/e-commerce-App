@@ -1,13 +1,13 @@
-<div class="min-h-screen flex flex-col bg-slate-50">
-  <!-- Header global -->
-  <app-header></app-header>
+<div class="min-h-screen bg-slate-50">
+  <!-- Header global (fijo) -->
+  <app-header class="fixed inset-x-0 top-0 z-50"></app-header>
 
-  <!-- Área de notificaciones globales -->
-  <!-- <app-notifications></app-notifications> -->
-
-  <!-- Contenido de la página -->
-  <main class="flex-1 container mx-auto px-4 py-6">
-    <router-outlet></router-outlet>
+  <!-- Contenido: reserva espacio del header -->
+  <main class="pt-16">
+    <!-- Wrapper global para alinear TODO -->
+    <div class="mx-auto max-w-6xl px-4 py-6">
+      <router-outlet></router-outlet>
+    </div>
   </main>
 
   <!-- Footer opcional -->
