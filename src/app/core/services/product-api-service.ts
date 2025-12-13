@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { ApiHttpService } from './api-http-service';
-import { Observable } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 
-import { ApiProduct, ApiProductCategory } from '../models/api/product-api.model';
+import { ApiProduct, ApiProductCategory, ProductsByCategory } from '../models/api/product-api.model';
 
 @Injectable({
   providedIn: 'root',
@@ -27,5 +27,23 @@ export class ProductApiService {
 
   getProductsByCategory(category: string): Observable<ApiProduct[]> {
     return this.api.get<ApiProduct[]>(`${this.basePath}/category/${category}`);
+  }
+
+  getCatalogGroupedByCategory(): Observable<ProductsByCategory[]> {
+    return this.getAllCategories().pipe(
+      switchMap((categories) => {
+        if (!categories?.length) {
+          return of<ProductsByCategory[]>([]);
+        }
+
+        const requests = categories.map((category) =>
+          this.getProductsByCategory(category).pipe(
+            map((products) => ({ category, products }))
+          )
+        );
+
+        return forkJoin(requests);
+      })
+    );
   }
 }

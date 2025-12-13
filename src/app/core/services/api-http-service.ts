@@ -12,7 +12,7 @@ export interface ApiRequestOptions {
           | boolean
           | ReadonlyArray<string | number | boolean>;
       };
-  withCredencials: boolean;
+  withCredencials?: boolean;
   context?: HttpContext
 }
 
@@ -49,17 +49,17 @@ export class ApiHttpService {
     return this.http.post<T>(url, payload, options);
   }
 
-  put<T>(path: string, payload: unknown, options: ApiRequestOptions): Observable<T>{
+  put<T>(path: string, payload: unknown, options?: ApiRequestOptions): Observable<T>{
     const url = this.buildUrl(path);
     return this.http.put<T>(url, payload, options);
   }
 
-  patch<T>(path: string, payload: unknown, options: ApiRequestOptions): Observable<T>{
+  patch<T>(path: string, payload: unknown, options?: ApiRequestOptions): Observable<T>{
     const url = this.buildUrl(path);
     return this.http.patch<T>(url, payload, options);
   }
 
-  delete<T>(path: string, options: ApiRequestOptions): Observable<T> {
+  delete<T>(path: string, options?: ApiRequestOptions): Observable<T> {
     const url = this.buildUrl(path);
     return this.http.delete<T>(url, options);
   }
