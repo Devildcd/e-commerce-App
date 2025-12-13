@@ -9,14 +9,14 @@ import {
 
 import { forkJoin } from 'rxjs';
 
-import { ApiProduct } from "../models/api/product-api.model";
 import { ProductApiService } from '../services/product-api-service';
+import { Product } from '../models/domain/product.model';
 
 
 type LoadStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export interface CatalogState {
-  products: ApiProduct[];
+  products: Product[];
   categories: string[];
   selectedCategory: string | null;
   searchTerm: string;

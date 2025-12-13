@@ -1,15 +1,16 @@
 import { computed } from "@angular/core";
 import { patchState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
+import { Product } from "../models/domain/product.model";
 
-export interface CartItemState {
+export interface CartItem {
   productId: number;
-  title: string;
-  unitPrice: number;
+  product: Product;
   quantity: number;
+  unitPrice: number;
 }
 
 export interface CartState {
-  items: CartItemState[];
+  items: CartItem[];
 }
 
 const initialState: CartState = {
@@ -36,23 +37,36 @@ export const CartStore = signalStore(
   })),
 
   withMethods((store) => ({
-    addItem(payload: CartItemState): void {
-      const current = store.items();
-      const index = current.findIndex(
-        (item) => item.productId === payload.productId
+    addProduct(product: Product, quantity = 1): void {
+      if (!product) {
+        return;
+      }
+
+      const items = store.items();
+      const index = items.findIndex(
+        (item) => item.productId === product.id
       );
 
-      let next: CartItemState[];
+      const safeQuantity = quantity > 0 ? quantity : 1;
+
+      let next: CartItem[];
 
       if (index === -1) {
-        const quantity = payload.quantity > 0 ? payload.quantity : 1;
-        next = [...current, { ...payload, quantity }];
+        next = [
+          ...items,
+          {
+            productId: product.id,
+            product,
+            quantity: safeQuantity,
+            unitPrice: product.price,
+          },
+        ];
       } else {
-        next = current.map((item, i) =>
+        next = items.map((item, i) =>
           i === index
             ? {
                 ...item,
-                quantity: item.quantity + (payload.quantity || 1),
+                quantity: item.quantity + safeQuantity,
               }
             : item
         );
@@ -70,7 +84,9 @@ export const CartStore = signalStore(
     },
 
     updateQuantity(productId: number, quantity: number): void {
-      if (quantity <= 0) {
+      const normalized = Math.max(0, quantity);
+
+      if (normalized === 0) {
         const next = store
           .items()
           .filter((item) => item.productId !== productId);
@@ -79,7 +95,9 @@ export const CartStore = signalStore(
       }
 
       const next = store.items().map((item) =>
-        item.productId === productId ? { ...item, quantity } : item
+        item.productId === productId
+          ? { ...item, quantity: normalized }
+          : item
       );
 
       patchState(store, { items: next });
@@ -87,6 +105,25 @@ export const CartStore = signalStore(
 
     clear(): void {
       patchState(store, { items: [] });
+    },
+
+    // snapshoot pa luego, cuando este listo checkout
+    getSnapshot() {
+      const items = store.items();
+      const totalItems = items.reduce(
+        (total, item) => total + item.quantity,
+        0
+      );
+      const totalAmount = items.reduce(
+        (total, item) => total + item.quantity * item.unitPrice,
+        0
+      );
+
+      return {
+        items,
+        totalItems,
+        totalAmount,
+      };
     },
   }))
 );

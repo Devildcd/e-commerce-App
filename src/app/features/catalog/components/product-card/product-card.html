@@ -1,55 +1,51 @@
 <article
   class="group relative overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/60 transition hover:-translate-y-0.5 hover:shadow-md"
 >
-  <!-- Media (más baja) -->
+  <!-- Media -->
   <div class="relative aspect-[4/3] max-h-[210px] bg-slate-50">
     <img
-      [src]="image()"
+      [src]="image() || 'https://via.placeholder.com/400x300?text=Product'"
       [alt]="title()"
       class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
       loading="lazy"
     />
 
-    <!-- Heart (estático) -->
+    <!-- Heart (decorativo por ahora) -->
     <button
       type="button"
       class="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200/70 backdrop-blur transition hover:bg-white"
       aria-label="Add to favorites"
     >
-      <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
-        <path
-          d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
+      <span class="material-symbols-outlined text-[20px] text-slate-700">
+        favorite
+      </span>
     </button>
 
-    <!-- Acciones overlay (desktop hover) -->
+    <!-- Acciones overlay (desktop) -->
     <div
       class="pointer-events-none absolute inset-x-3 bottom-3 flex gap-2 opacity-0 transition
              group-hover:pointer-events-auto group-hover:opacity-100"
     >
-      <a
+      <button
+        type="button"
         class="inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-xl bg-white/95 px-3 text-sm font-medium text-slate-900 shadow-sm ring-1 ring-slate-200/70 backdrop-blur hover:bg-white"
+        (click)="onViewDetails()"
       >
-        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <span class="material-symbols-outlined text-[18px]">
+          visibility
+        </span>
         Detalles
-      </a>
+      </button>
 
       <button
         type="button"
         class="inline-flex h-9 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/20 hover:bg-slate-800"
         aria-label="Add to cart"
+        (click)="onAddToCart()"
       >
-        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 6h15l-1.5 8.5a2 2 0 0 1-2 1.5H9a2 2 0 0 1-2-1.6L5 3H2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M17 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <span class="material-symbols-outlined text-[20px]">
+          add_shopping_cart
+        </span>
       </button>
     </div>
   </div>
@@ -62,12 +58,12 @@
 
     <div class="mt-2 flex items-center gap-2 text-xs text-slate-600">
       <span class="inline-flex items-center gap-1">
-        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor">
-          <path
-            d="M12 17.3l-5.4 3 1-6.1-4.4-4.3 6.1-.9L12 3.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1z"
-          />
-        </svg>
-        <span class="font-medium text-slate-800">{{ rating() }}</span>
+        <span class="material-symbols-outlined text-[18px] text-amber-500">
+          star
+        </span>
+        <span class="font-medium text-slate-800">
+          {{ displayRating() }}
+        </span>
       </span>
 
       <span class="h-1 w-1 rounded-full bg-slate-300"></span>
@@ -79,17 +75,20 @@
         {{ formattedPrice() }}
       </p>
 
-      <!-- Acciones (siempre visibles en mobile) -->
+      <!-- Acciones visibles en mobile -->
       <div class="flex gap-2 md:hidden">
-        <a
+        <button
+          type="button"
           class="inline-flex h-9 items-center justify-center rounded-xl bg-white px-3 text-sm font-medium text-slate-900 shadow-sm ring-1 ring-slate-200/70 hover:bg-slate-50"
+          (click)="onViewDetails()"
         >
           Detalles
-        </a>
+        </button>
 
         <button
           type="button"
           class="inline-flex h-9 items-center justify-center rounded-xl bg-slate-900 px-3 text-sm font-medium text-white shadow-sm hover:bg-slate-800"
+          (click)="onAddToCart()"
         >
           Añadir
         </button>
