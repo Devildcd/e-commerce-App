@@ -8,9 +8,11 @@ import { CartStore } from '../../../core/state/cart-store';
 import { AppStore } from '../../../core/state/app-store';
 import { MiniCartDropdown } from '../mini-cart-dropdown/mini-cart-dropdown';
 
+import { RouterLink } from '@angular/router';
+
 @Component({
   selector: 'app-header',
-  imports: [ReactiveFormsModule, MiniCartDropdown],
+  imports: [ReactiveFormsModule, MiniCartDropdown, RouterLink],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })

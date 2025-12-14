@@ -1,28 +1,86 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CurrencyPipe } from '@angular/common';
+
+import { ActivatedRoute, RouterLink } from '@angular/router';
+
+import { ProductDetailsStore } from '../../../../core/state/product-details.store';
+import { CartStore } from '../../../../core/state/cart-store';
 
 @Component({
   selector: 'app-product-detail-page',
-  imports: [CommonModule],
+  imports: [CurrencyPipe, RouterLink],
   templateUrl: './product-detail-page.html',
   styleUrl: './product-detail-page.scss',
 })
 export class ProductDetailPage {
 
-  items = [
-    {
-      id: 1,
-      title: 'Producto en carrito 1',
-      price: 49.99,
-      quantity: 2,
-      image: 'https://via.placeholder.com/80x80.png?text=P1',
-    },
-    {
-      id: 2,
-      title: 'Producto en carrito 2',
-      price: 19.99,
-      quantity: 1,
-      image: 'https://via.placeholder.com/80x80.png?text=P2',
-    },
-  ];
+  private readonly route = inject(ActivatedRoute);
+  private readonly detailsStore = inject(ProductDetailsStore);
+  private readonly cartStore = inject(CartStore);
+
+  // signal local, OJO => revisar luego para q no rompa patron 
+  private readonly _quantity = signal(1);
+
+  // signals que vienen del store
+  readonly product = this.detailsStore.product;
+  readonly status = this.detailsStore.status;
+
+  readonly quantity = this._quantity.asReadonly();
+
+  readonly rating = computed(() => this.product()?.rating?.rate ?? null);
+  readonly ratingCount = computed(
+    () => this.product()?.rating?.count ?? null
+  );
+
+  constructor() {
+    this.route.paramMap
+      .pipe(takeUntilDestroyed())
+      .subscribe((params) => {
+        const rawId = params.get('id');
+        const id = rawId ? Number(rawId) : NaN;
+
+        if (!Number.isFinite(id)) {
+          this.detailsStore.clear();
+          return;
+        }
+
+        this.detailsStore.loadById(id);
+      });
+  }
+
+  // incrementar/decrementar 
+  decreaseQuantity(): void {
+    const current = this._quantity();
+    if (current <= 1) {
+      return;
+    }
+    this._quantity.set(current - 1);
+  }
+
+  increaseQuantity(): void {
+    const current = this._quantity();
+    this._quantity.set(current + 1);
+  }
+
+  onQuantityInputChange(rawValue: string): void {
+    const parsed = Number(rawValue);
+
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    const normalized = Math.max(1, Math.floor(parsed));
+    this._quantity.set(normalized);
+  }
+
+  // funcionalidades pa agregar al carrito
+  addToCart(): void {
+    const product = this.product();
+    if (!product) {
+      return;
+    }
+
+    this.cartStore.addProduct(product, this._quantity());
+  }
 }

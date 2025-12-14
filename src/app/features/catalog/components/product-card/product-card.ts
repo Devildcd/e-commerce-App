@@ -1,4 +1,5 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-card',
@@ -8,18 +9,19 @@ import { Component, computed, input, output } from '@angular/core';
 })
 export class ProductCard {
 
-  // Datos que vienen del container
+  private readonly router = inject(Router);
+
+  // datos que vienen del container
   title = input.required<string>();
   description = input<string>('');
   price = input.required<number>();
   image = input<string>('');
   productId = input.required<number>();
 
-  // Estos los puedes mapear desde el modelo si quieres
   rating = input<number | null>(null);
   soldLabel = input<string>('2K+ sold');
 
-  // Eventos hacia el container
+  // eventos q salen para el container
   addToCart = output<number>();
   viewDetails = output<number>();
 
@@ -41,5 +43,6 @@ export class ProductCard {
 
   onViewDetails(): void {
     this.viewDetails.emit(this.productId());
+    this.router.navigate(["/product", this.productId()]);
   }
 }
