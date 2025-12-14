@@ -1,9 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 
 import { CartItem, CartStore } from '../../../../core/state/cart-store';
-
-import { RouterLink } from '@angular/router';
+import { AuthStore } from '../../../../core/state/auth-store';
+import { AppStore } from '../../../../core/state/app-store';
 
 @Component({
   selector: 'app-cart-page',
@@ -14,6 +15,10 @@ import { RouterLink } from '@angular/router';
 export class CartPage {
 
   private readonly cartStore = inject(CartStore);
+  private readonly authStore = inject(AuthStore);
+  private readonly appStore = inject(AppStore);
+  private readonly router = inject(Router);
+
 
   readonly items = this.cartStore.items;
   readonly totalItems = this.cartStore.totalItems;
@@ -47,5 +52,20 @@ export class CartPage {
 
   trackByProductId(_index: number, item: CartItem): number {
     return item.productId;
+  }
+
+  // comprueba q el user este auth antes de ir a checkout
+  onCheckoutClick(): void {
+    if (this.totalItems() === 0) {
+      return;
+    }
+
+    // si no está auth, disparo el modal
+    if (!this.authStore.isAuthenticated()) {
+      this.appStore.openLoginModal();
+      return;
+    }
+
+    this.router.navigate(['/checkout']);
   }
 }

@@ -26,11 +26,10 @@ export class MiniCartDropdown {
 
   close(): void {
     this.appStore.closeMiniCart();
-    this.router.navigate(["/cart"]);
   }
 
-  goToCheck(): void {
-    this.router.navigate(["/checkout"]);
+  goToCart(): void {
+    this.router.navigate(["/cart"]);
   }
 
   removeItem(productId: number): void {
