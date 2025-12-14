@@ -40,22 +40,33 @@
         </button>
 
         <!-- Cart -->
-        <a routerLink="/cart" class="relative inline-flex h-10 items-center gap-2 rounded-full px-3 hover:bg-slate-100"
-          aria-label="Carrito">
-          <span class="material-symbols-outlined text-[22px] text-slate-700">
-            shopping_cart
-          </span>
-          <span class="hidden sm:inline text-sm font-medium text-slate-700">
-            Cart
-          </span>
+       <div class="relative">
+          <button
+            type="button"
+            class="relative inline-flex h-10 items-center gap-2 rounded-full px-3 hover:bg-slate-100"
+            aria-label="Carrito"
+            (click)="onCartClick()"
+            [attr.aria-expanded]="isMiniCartOpen()"
+          >
+            <span class="material-symbols-outlined text-[22px] text-slate-700">
+              shopping_cart
+            </span>
+            <span class="hidden sm:inline text-sm font-medium text-slate-700">
+              Cart
+            </span>
 
-          @if (totalCartItems() > 0) {
-          <span
-            class="absolute -right-0.5 -top-0.5 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-semibold text-white">
-            {{ totalCartItems() }}
-          </span>
-          }
-        </a>
+            @if (totalCartItems() > 0) {
+              <span
+                class="absolute -right-0.5 -top-0.5 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-semibold text-white"
+              >
+                {{ totalCartItems() }}
+              </span>
+            }
+          </button>
+
+          <!-- Dropdown del mini-cart (se controla con AppStore.miniCartOpen) -->
+          <app-mini-cart-dropdown></app-mini-cart-dropdown>
+        </div>
 
         <!-- Auth -->
         <a routerLink="/auth/login"
