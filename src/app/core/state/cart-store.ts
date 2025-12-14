@@ -125,5 +125,13 @@ export const CartStore = signalStore(
         totalAmount,
       };
     },
+
+    // para restaurar la sesion desde el local storage y q no se pierda el state del cart
+    restore(items: CartItem[]): void {
+      if (!Array.isArray(items)) {
+        return;
+      }
+      patchState(store, { items });
+    },
   }))
 );
