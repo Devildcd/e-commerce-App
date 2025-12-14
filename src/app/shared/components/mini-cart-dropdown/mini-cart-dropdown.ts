@@ -4,6 +4,8 @@ import { CurrencyPipe } from '@angular/common';
 import { CartStore } from '../../../core/state/cart-store';
 import { AppStore } from '../../../core/state/app-store';
 
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-mini-cart-dropdown',
   imports: [CurrencyPipe],
@@ -14,6 +16,7 @@ export class MiniCartDropdown {
 
   private readonly cartStore = inject(CartStore);
   private readonly appStore = inject(AppStore);
+  private readonly router = inject(Router);
 
   // signals de los stores
   readonly items = this.cartStore.items;
@@ -23,6 +26,11 @@ export class MiniCartDropdown {
 
   close(): void {
     this.appStore.closeMiniCart();
+    this.router.navigate(["/cart"]);
+  }
+
+  goToCheck(): void {
+    this.router.navigate(["/checkout"]);
   }
 
   removeItem(productId: number): void {

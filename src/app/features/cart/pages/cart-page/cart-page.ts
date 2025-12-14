@@ -1,77 +1,51 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
+
+import { CartItem, CartStore } from '../../../../core/state/cart-store';
+
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-cart-page',
-  imports: [CommonModule],
+  imports: [CurrencyPipe, RouterLink],
   templateUrl: './cart-page.html',
   styleUrl: './cart-page.scss',
 })
 export class CartPage {
 
-   items = [
-    {
-      id: 1,
-      title: 'Producto en carrito 1',
-      price: 49.99,
-      quantity: 2,
-      image: 'https://via.placeholder.com/80x80.png?text=P1',
-    },
-    {
-      id: 1,
-      title: 'Producto en carrito 1',
-      price: 49.99,
-      quantity: 2,
-      image: 'https://via.placeholder.com/80x80.png?text=P1',
-    },
-    {
-      id: 1,
-      title: 'Producto en carrito 1',
-      price: 49.99,
-      quantity: 2,
-      image: 'https://via.placeholder.com/80x80.png?text=P1',
-    },
-    {
-      id: 1,
-      title: 'Producto en carrito 1',
-      price: 49.99,
-      quantity: 2,
-      image: 'https://via.placeholder.com/80x80.png?text=P1',
-    },
-    {
-      id: 1,
-      title: 'Producto en carrito 1',
-      price: 49.99,
-      quantity: 2,
-      image: 'https://via.placeholder.com/80x80.png?text=P1',
-    },
-    {
-      id: 1,
-      title: 'Producto en carrito 1',
-      price: 49.99,
-      quantity: 2,
-      image: 'https://via.placeholder.com/80x80.png?text=P1',
-    },
-    {
-      id: 1,
-      title: 'Producto en carrito 1',
-      price: 49.99,
-      quantity: 2,
-      image: 'https://via.placeholder.com/80x80.png?text=P1',
-    },
-    {
-      id: 1,
-      title: 'Producto en carrito 1',
-      price: 49.99,
-      quantity: 2,
-      image: 'https://via.placeholder.com/80x80.png?text=P1',
-    },
-    {
-      id: 2,
-      title: 'Producto en carrito 2',
-      price: 19.99,
-      quantity: 1,
-      image: 'https://via.placeholder.com/80x80.png?text=P2',
-    },
-  ];
+  private readonly cartStore = inject(CartStore);
+
+  readonly items = this.cartStore.items;
+  readonly totalItems = this.cartStore.totalItems;
+  readonly totalAmount = this.cartStore.totalAmount;
+  readonly isEmpty = this.cartStore.isEmpty;
+
+
+  onRemoveItem(productId: number): void {
+    this.cartStore.removeItem(productId);
+  }
+
+  onDecreaseQuantity(item: CartItem): void {
+    const next = item.quantity - 1;
+    this.cartStore.updateQuantity(item.productId, next);
+  }
+
+  onIncreaseQuantity(item: CartItem): void {
+    const next = item.quantity + 1;
+    this.cartStore.updateQuantity(item.productId, next);
+  }
+
+  onQuantityInputChange(item: CartItem, rawValue: string): void {
+    const parsed = Number(rawValue);
+
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+
+    this.cartStore.updateQuantity(item.productId, parsed);
+  }
+
+  trackByProductId(_index: number, item: CartItem): number {
+    return item.productId;
+  }
 }
