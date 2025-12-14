@@ -13,5 +13,9 @@ export interface ApiProduct {
   rating?: ApiProductRating;
 }
 
+export interface ProductsByCategory {
+  category: string;
+  products: ApiProduct[];
+}
 
 export type ApiProductCategory = string;

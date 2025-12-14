@@ -10,21 +10,17 @@
 
     <!-- Paginador estático -->
     <nav class="flex items-center gap-2" aria-label="Pagination">
-      <button
-        type="button"
+      <button type="button"
         class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200/60 transition hover:bg-slate-50"
-        aria-label="Previous page"
-      >
+        aria-label="Previous page">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
 
-      <button
-        type="button"
+      <button type="button"
         class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200/60 transition hover:bg-slate-50"
-        aria-label="Next page"
-      >
+        aria-label="Next page">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -34,34 +30,28 @@
 
   <!-- Grid -->
   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    @for (p of products; track p.id) {
-      <app-product-card
-        [title]="p.title"
-        [description]="p.description"
-        [price]="p.price"
-        [image]="p.image"
-        [productId]="p.id"
-      />
+    @for (p of products(); track p.id) {
+    <app-product-card [title]="p.title" [description]="p.description" [price]="p.price" [image]="p.image"
+      [productId]="p.id" [rating]="p.rating?.rate ?? null" (addToCart)="onAddToCart(p)"
+      (viewDetails)="onViewDetails(p.id)" />
     } @empty {
-      <div class="col-span-full">
-        <div class="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
-          <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-slate-100 ring-1 ring-slate-200">
-            <span class="material-symbols-outlined text-slate-500">inventory_2</span>
-          </div>
-
-          <h3 class="mt-4 text-base font-semibold text-slate-900">Sin productos</h3>
-          <p class="mt-1 text-sm text-slate-600">
-            No hay productos para mostrar con los filtros actuales.
-          </p>
-
-          <button
-            type="button"
-            class="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800"
-          >
-            Limpiar filtros
-          </button>
+    <div class="col-span-full">
+      <div class="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
+        <div class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-slate-100 ring-1 ring-slate-200">
+          <span class="material-symbols-outlined text-slate-500">inventory_2</span>
         </div>
+
+        <h3 class="mt-4 text-base font-semibold text-slate-900">Sin productos</h3>
+        <p class="mt-1 text-sm text-slate-600">
+          No hay productos para mostrar con los filtros actuales.
+        </p>
+
+        <button type="button"
+          class="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800">
+          Limpiar filtros
+        </button>
       </div>
+    </div>
     }
   </div>
 </section>

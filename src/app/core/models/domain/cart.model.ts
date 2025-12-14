@@ -1,12 +1,15 @@
+import { CartItem } from "../../state/cart-store";
 import { Product } from "./product.model";
 
-export interface CartItem {
-  productId: number;
-  product: Product;
-  quantity: number;
-  unitPrice: number;
-  subtotal: number; // recordar, esto sale de multiplicar precio unitario * cantidad
-}
+// export interface CartItem {
+//   productId: number;
+//   product: Product;
+//   quantity: number;
+//   unitPrice: number;
+//   subtotal: number;
+//   }
+  // recordar, esto sale de multiplicar precio unitario * cantidad
+
 
 // Esto es para usar en el state luego
 export interface CartStateModel {
