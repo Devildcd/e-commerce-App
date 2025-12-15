@@ -59,7 +59,6 @@ export const ProductDetailsStore = signalStore(
       });
     },
 
-    // para cuando quieras inyectar un Product ya obtenido (por ejemplo, del catalog)
     setProduct(product: Product): void {
       patchState(store, {
         product,

@@ -53,7 +53,7 @@ export class Header {
         this.catalogStore.setSearchTerm(term ?? '');
       });
 
-      this.updateShowSearch(this.router.url);
+    this.updateShowSearch(this.router.url);
 
     // aqui escucho el cambio en la ruta
     this.router.events
@@ -82,7 +82,7 @@ export class Header {
     this.appStore.toggleMiniCart();
   }
 
-   onLoginClick(): void {
+  onLoginClick(): void {
     this.appStore.openLoginModal();
   }
 

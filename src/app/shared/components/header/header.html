@@ -34,17 +34,14 @@
       <div class="flex items-center gap-1">
         <!-- Search icon (mobile) -->
         @if (showSearch()) {
-  <button
-    type="button"
-    class="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-slate-100"
-    aria-label="Buscar"
-     [attr.aria-pressed]="isMobileSearchOpen()"
-    (click)="onMobileSearchToggle()">
-    <span class="material-symbols-outlined text-[22px] text-slate-700">
-      search
-    </span>
-  </button>
-}
+        <button type="button"
+          class="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-slate-100"
+          aria-label="Buscar" [attr.aria-pressed]="isMobileSearchOpen()" (click)="onMobileSearchToggle()">
+          <span class="material-symbols-outlined text-[22px] text-slate-700">
+            search
+          </span>
+        </button>
+        }
 
         <!-- Cart -->
         <div class="relative">
@@ -112,20 +109,16 @@
 
     <!-- Mobile search bar -->
     @if (showSearch() && isMobileSearchOpen()) {
-  <div class="md:hidden pb-3">
-    <div class="relative">
-      <span
-        class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-slate-500">
-        search
-      </span>
-      <input
-        [formControl]="searchControl"
-        type="search"
-        placeholder="What are you looking for?..."
-        class="h-11 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm outline-none
+    <div class="md:hidden pb-3">
+      <div class="relative">
+        <span
+          class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-slate-500">
+          search
+        </span>
+        <input [formControl]="searchControl" type="search" placeholder="What are you looking for?..." class="h-11 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm outline-none
                focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-900/10" />
+      </div>
     </div>
-  </div>
-}
+    }
   </div>
 </header>

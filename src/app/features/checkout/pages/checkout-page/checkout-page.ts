@@ -117,8 +117,8 @@ export class CheckoutPage {
   }
 
   // pay metodos
-   onPaymentSubmit(value: Record<string, unknown>): void {
-    if (this.isProcessing()) return; // guard
+  onPaymentSubmit(value: Record<string, unknown>): void {
+    if (this.isProcessing()) return;
 
     const snapshot = this.cartStore.getSnapshot();
 
@@ -154,6 +154,22 @@ export class CheckoutPage {
 
   goToCart() {
     this.router.navigate(["/cart"]);
+  }
+
+  // guard para evitar salir mientras esta procesando
+  canDeactivate(): boolean {
+    if (this.checkoutStore.isProcessing()) {
+      return confirm('Payment is processing. Are you sure you want to leave?');
+    }
+
+    const hasProgress =
+      this.checkoutStore.hasShipping() && this.cartStore.totalItems() > 0;
+
+    if (hasProgress) {
+      return confirm('You have progress in checkout. Leave anyway?');
+    }
+
+    return true;
   }
 }
 
