@@ -1,59 +1,97 @@
-# ECommerceApp
+# E-commerce App (Angular 20)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.13.
+Small e-commerce frontend built with Angular 20 using a feature-based architecture, standalone components, and Signal Stores. The backend is simulated using Fake Store API.
 
-## Development server
+**Fake API:** <https://fakestoreapi.com/>
 
-To start a local development server, run:
+> **Note:** Auth is simulated and handled via a modal (there is no /login route). Protected routes redirect back to `/` and can optionally preserve a `returnUrl` query param.
 
-```bash
-ng serve
-```
+---
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 🚀 Features
 
-## Code scaffolding
+### Catalog with
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+* products fetch from Fake Store API
+* category filtering
+* search term filtering
+* pagination (client-side)
+* Product detail route (lazy-loaded)
 
-```bash
-ng generate component component-name
-```
+### Cart
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+* add/remove items
+* update quantities
+* totals (items + amount)
+* cart dropdown (scrollable list + sticky subtotal/actions)
 
-```bash
-ng generate --help
-```
+### Checkout
 
-## Building
+* shipping + payment forms (simulated payment)
+* processing spinner during payment simulation
+* optional “pending changes” protection via `canDeactivate`
 
-To build the project run:
+### Global UX
 
-```bash
-ng build
-```
+* sticky header
+* notifications/toasts (auto-dismiss)
+* logging service (dev-friendly)
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## 🛠️ Tech Stack
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+* Angular 20 (standalone + modern template control flow `@if`, `@for`)
+* `@ngrx/signals` (Signal Store pattern for state)
+* TailwindCSS + a bit of SCSS where needed
+* HTTP interceptors (global error normalization + notifications)
+* Guards: `canActivate`, `canMatch`, `canDeactivate`
 
-```bash
-ng test
-```
+---
 
-## Running end-to-end tests
+## 📂 Project Structure
 
-For end-to-end (e2e) testing, run:
+The app is split by features, with shared UI and a small core layer for cross-cutting concerns.
 
-```bash
-ng e2e
-```
+src/app ├── core/ │ ├── errors/ # Global error handler, error mapping utilities │ ├── guards/ # Route guards (auth, cart-not-empty, canDeactivate, etc.) │ ├── interceptors/ # HTTP interceptors (e.g. httpErrorInterceptor) │ ├── models/ # Domain models (Product, CartItem, etc.) │ ├── services/ # Infrastructure services (API clients, logging, notifications) │ ├── state/ # App-wide stores when needed (UiStore, etc.) │ └── utils/ # Helpers ├── features/ │ ├── auth/ # Auth feature (modal-based login, AuthStore) │ ├── cart/ # Cart feature (CartStore, pages, components) │ ├── catalog/ # Catalog feature (CatalogStore, pages, components) │ └── checkout/ # Checkout feature (CheckoutStore, pages, guards) ├── layout/ │ └── main-layout/ # Main layout shell (header, router outlet, footer) └── shared/ ├── components/ # Reusable components (footer, header pieces, etc.) ├── directives/ # Reusable directives ├── interfaces/ # Shared types/contracts ├── pipes/ # Pipes (e.g. shortDescription) └── ui/ # UI primitives (spinner, etc.)
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+## 🧩 Architecture Notes
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+* **Flow:** `UI components/pages` → `Stores` → `Services/API`
+* Pages/components do not call `HttpClient` directly.
+* Services deal with HTTP, mapping, and infrastructure concerns.
+* This keeps the UI clean and avoids “smart templates”.
+
+---
+
+## 🧭 Routing
+
+* Routes are lazy-loaded per feature. Sensitive routes are protected:
+  * `/cart` → requires auth
+  * `/checkout` → requires auth + cart not empty
+* Checkout uses `canDeactivate` to prevent leaving during processing / pending progress.
+* Because login is modal-based, guards redirect to `/` and can push a notification like “Please login to continue”.
+
+---
+
+## 🏃 Running Locally
+
+1. `npm install`
+2. `ng serve`
+
+Then open <http://localhost:4200>.
+
+---
+
+## ⚙️ Environment / Assets
+
+* Static assets are served from `public/` (Angular modern approach).
+* Components use modern Angular metadata (`styleUrl`).
+
+---
+
+## 📌 What’s Next (Planned)
+
+* Unit tests / component tests (not added yet)
