@@ -22,6 +22,9 @@ export interface CatalogState {
   searchTerm: string;
   status: LoadStatus;
   errorMessage: string | null;
+
+  pageIndex: number;
+  pageSize: number;
 }
 
 const initialState: CatalogState = {
@@ -31,117 +34,227 @@ const initialState: CatalogState = {
   searchTerm: '',
   status: 'idle',
   errorMessage: null,
+  pageIndex: 0,
+  pageSize: 8,
 };
+
+// helper para filtrar productos
+function filterProducts(
+  products: Product[],
+  category: string | null,
+  searchTerm: string
+): Product[] {
+  if (!products.length) {
+    return [];
+  }
+
+  const term = searchTerm.trim().toLowerCase();
+
+  return products.filter((product) => {
+    if (category && product.category !== category) {
+      return false;
+    }
+
+    if (!term) {
+      return true;
+    }
+
+    const text = `${product.title} ${product.description}`.toLowerCase();
+    return text.includes(term);
+  });
+}
 
 export const CatalogStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
 
-   withComputed((store) => ({
-    filteredProducts: computed(() => {
-      const items = store.products();
-      const category = store.selectedCategory();
-      const term = store.searchTerm().trim().toLowerCase();
+  withComputed((store) => {
+    const filteredProducts = computed(() =>
+      filterProducts(
+        store.products(),
+        store.selectedCategory(),
+        store.searchTerm()
+      )
+    );
 
-      if (!items.length) {
+    const totalPages = computed(() => {
+      const items = filteredProducts();
+      const size = store.pageSize();
+
+      if (!items.length || size <= 0) {
+        return 1;
+      }
+
+      return Math.ceil(items.length / size);
+    });
+
+    // productos de la página actual
+    const currentPageProducts = computed(() => {
+      const items = filteredProducts();
+      const size = store.pageSize();
+
+      if (!items.length || size <= 0) {
         return [];
       }
 
-      return items.filter((product) => {
-        if (category && product.category !== category) {
-          return false;
-        }
+      const total = totalPages();
+      const rawIndex = store.pageIndex();
+      const safeIndex = Math.min(Math.max(rawIndex, 0), total - 1);
 
-        if (!term) {
-          return true;
-        }
+      const start = safeIndex * size;
+      const end = start + size;
 
-        const text = `${product.title} ${product.description}`.toLowerCase();
-        return text.includes(term);
-      });
-    }),
-  })),
+      return items.slice(start, end);
+    });
 
-  withMethods((store, api = inject(ProductApiService)) => ({
-    loadCatalog(): void {
-      // Pa lanzar solo una vez, por si acaso
-      if (store.status() === 'loading') {
-        return;
+    const hasPrevPage = computed(() => store.pageIndex() > 0);
+
+    const hasNextPage = computed(() => {
+      const items = filteredProducts();
+      const size = store.pageSize();
+
+      if (!items.length || size <= 0) {
+        return false;
       }
 
-      patchState(store, {
-        status: 'loading',
-        errorMessage: null,
-      });
+      const total = totalPages();
+      return store.pageIndex() < total - 1;
+    });
 
-      forkJoin({
-        products: api.getAllProducts(),
-        categories: api.getAllCategories(),
-      }).subscribe({
-        next: ({ products, categories }) => {
-          const currentCategory = store.selectedCategory();
-          const validCategory =
-            currentCategory && categories.includes(currentCategory)
-              ? currentCategory
-              : null;
+    return {
+      filteredProducts,
+      totalPages,
+      currentPageProducts,
+      hasPrevPage,
+      hasNextPage,
+    };
+  }),
 
-          patchState(store, {
-            products,
-            categories,
-            selectedCategory: validCategory,
-            status: 'success',
-            errorMessage: null,
-          });
-        },
-        error: () => {
-          patchState(store, {
-            status: 'error',
-            errorMessage: 'No se pudo cargar el catálogo.',
-          });
-        },
-      });
-    },
+  withMethods((store, api = inject(ProductApiService)) => {
+    const getFilteredCount = (): number =>
+      filterProducts(
+        store.products(),
+        store.selectedCategory(),
+        store.searchTerm()
+      ).length;
 
-    reloadCategories(): void {
-      api.getAllCategories().subscribe({
-        next: (categories) => {
-          const currentCategory = store.selectedCategory();
-          const validCategory =
-            currentCategory && categories.includes(currentCategory)
-              ? currentCategory
-              : null;
+    const clampPageIndex = (desired: number): number => {
+      const size = store.pageSize();
+      const totalItems = getFilteredCount();
 
-          patchState(store, {
-            categories,
-            selectedCategory: validCategory,
-          });
-        },
-        error: () => {
-          if (!store.errorMessage()) {
+      if (!totalItems || size <= 0) {
+        return 0;
+      }
+
+      const totalPages = Math.ceil(totalItems / size);
+      const min = 0;
+      const max = totalPages - 1;
+
+      return Math.min(Math.max(desired, min), max);
+    };
+
+    return {
+      loadCatalog(): void {
+        if (store.status() === 'loading') {
+          return;
+        }
+
+        patchState(store, {
+          status: 'loading',
+          errorMessage: null,
+        });
+
+        forkJoin({
+          products: api.getAllProducts(),
+          categories: api.getAllCategories(),
+        }).subscribe({
+          next: ({ products, categories }) => {
+            const currentCategory = store.selectedCategory();
+            const validCategory =
+              currentCategory && categories.includes(currentCategory)
+                ? currentCategory
+                : null;
+
             patchState(store, {
-              errorMessage: 'No se pudieron actualizar las categorías.',
+              products,
+              categories,
+              selectedCategory: validCategory,
+              status: 'success',
+              errorMessage: null,
+              pageIndex: 0,
             });
-          }
-        },
-      });
-    },
+          },
+          error: () => {
+            patchState(store, {
+              status: 'error',
+              errorMessage: 'The catalog could not be loaded.',
+            });
+          },
+        });
+      },
 
-    setSearchTerm(term: string): void {
-      patchState(store, {
-        searchTerm: term?.trim() ?? '',
-      });
-    },
+      reloadCategories(): void {
+        api.getAllCategories().subscribe({
+          next: (categories) => {
+            const currentCategory = store.selectedCategory();
+            const validCategory =
+              currentCategory && categories.includes(currentCategory)
+                ? currentCategory
+                : null;
 
-    setSelectedCategory(category: string | null): void {
-      const normalized = category || null;
+            patchState(store, {
+              categories,
+              selectedCategory: validCategory,
+              pageIndex: 0,
+            });
+          },
+          error: () => {
+            if (!store.errorMessage()) {
+              patchState(store, {
+                errorMessage: 'No se pudieron actualizar las categorías.',
+              });
+            }
+          },
+        });
+      },
 
-      if (normalized && !store.categories().includes(normalized)) {
-        return; // recordar, si me llega algo q no esta en la lista lo ignoro
-      }
+      setSearchTerm(term: string): void {
+        patchState(store, {
+          searchTerm: term?.trim() ?? '',
+          pageIndex: 0,
+        });
+      },
 
-      patchState(store, {
-        selectedCategory: normalized,
-      });
-    },
-  }))
+      setSelectedCategory(category: string | null): void {
+        const normalized = category || null;
+
+        if (normalized && !store.categories().includes(normalized)) {
+          return;
+        }
+
+        patchState(store, {
+          selectedCategory: normalized,
+          pageIndex: 0,
+        });
+      },
+
+      goToPage(index: number): void {
+        patchState(store, {
+          pageIndex: clampPageIndex(index),
+        });
+      },
+
+      nextPage(): void {
+        patchState(store, {
+          pageIndex: clampPageIndex(store.pageIndex() + 1),
+        });
+      },
+
+      prevPage(): void {
+        patchState(store, {
+          pageIndex: clampPageIndex(store.pageIndex() - 1),
+        });
+      },
+    };
+  })
 );

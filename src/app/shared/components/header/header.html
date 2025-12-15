@@ -12,6 +12,7 @@
       </a>
 
       <!-- Search (desktop/tablet) -->
+      @if (showSearch()) {
       <form class="hidden md:flex flex-1 max-w-xl items-center" (submit)="$event.preventDefault()">
         <div class="relative w-full">
           <span
@@ -19,7 +20,7 @@
             search
           </span>
           <input [formControl]="searchControl" type="text" placeholder="What are you looking for?..." class="h-11 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-28 text-sm outline-none transition
-                   focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-900/10" />
+                     focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-900/10" />
           <button type="button"
             class="absolute right-1.5 top-1/2 -translate-y-1/2 h-9 rounded-full bg-slate-900 px-5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800"
             (click)="onSearchButtonClick()">
@@ -27,17 +28,20 @@
           </button>
         </div>
       </form>
+      }
 
       <!-- Actions -->
       <div class="flex items-center gap-1">
         <!-- Search icon (mobile) -->
+        @if (showSearch()) {
         <button type="button"
           class="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-slate-100"
-          aria-label="Buscar">
+          aria-label="Buscar" [attr.aria-pressed]="isMobileSearchOpen()" (click)="onMobileSearchToggle()">
           <span class="material-symbols-outlined text-[22px] text-slate-700">
             search
           </span>
         </button>
+        }
 
         <!-- Cart -->
         <div class="relative">
@@ -104,6 +108,7 @@
     </div>
 
     <!-- Mobile search bar -->
+    @if (showSearch() && isMobileSearchOpen()) {
     <div class="md:hidden pb-3">
       <div class="relative">
         <span
@@ -111,8 +116,9 @@
           search
         </span>
         <input [formControl]="searchControl" type="search" placeholder="What are you looking for?..." class="h-11 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm outline-none
-                 focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-900/10" />
+               focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-900/10" />
       </div>
     </div>
+    }
   </div>
 </header>

@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
 import { MainLayout } from './layout/main-layout/main-layout';
+import { authGuard } from './core/guards/auth-guard';
+import { cartNotEmptyGuard } from './core/guards/cart-not-empty-guard';
+import { checkoutDeactivateGuard } from './core/guards/checkout-deactivate-guard';
 
 export const routes: Routes = [
   {
@@ -20,6 +23,7 @@ export const routes: Routes = [
           import('./features/cart/cart.routes').then(
             (m) => m.CART_ROUTES
           ),
+         canActivate: [authGuard],
       },
       {
         path: 'checkout',
@@ -27,6 +31,7 @@ export const routes: Routes = [
           import('./features/checkout/checkout.routes').then(
             (m) => m.CHECKOUT_ROUTES
           ),
+        canActivate: [authGuard, cartNotEmptyGuard],
       },
     ],
   },

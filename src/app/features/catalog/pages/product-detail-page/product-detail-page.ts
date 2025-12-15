@@ -8,6 +8,7 @@ import { ProductDetailsStore } from '../../../../core/state/product-details.stor
 import { CartStore } from '../../../../core/state/cart-store';
 import { ShortDescriptionPipe } from '../../../../shared/pipes/short-description-pipe';
 import { TrackClick } from '../../../../shared/directives/track-click';
+import { CatalogStore } from '../../../../core/state/catalog-store';
 
 @Component({
   selector: 'app-product-detail-page',
@@ -20,6 +21,7 @@ export class ProductDetailPage {
   private readonly route = inject(ActivatedRoute);
   private readonly detailsStore = inject(ProductDetailsStore);
   private readonly cartStore = inject(CartStore);
+  private readonly catalogStore = inject(CatalogStore);
 
   // signal local, OJO => revisar luego para q no rompa patron 
   private readonly _quantity = signal(1);
@@ -54,6 +56,17 @@ export class ProductDetailPage {
           return;
         }
 
+        // intentar resolver desde el catalog global
+        const fromCatalog = this.catalogStore
+          .products()
+          .find((item) => item.id === id);
+
+        if (fromCatalog) {
+          this.detailsStore.setProduct(fromCatalog);
+          return;
+        }
+
+        // 2) Si no está en catalog, ir a la API
         this.detailsStore.loadById(id);
       });
   }

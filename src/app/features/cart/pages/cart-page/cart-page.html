@@ -150,9 +150,8 @@
 
       <button type="button"
         class="inline-flex h-11 w-full items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
-        (click)="onCheckoutClick()" [disabled]="totalItems() === 0"
-        appTrackClick="cart_checkout_click"
-  [trackPayload]="{ totalItems: totalItems(), totalAmount: totalAmount() }">
+        (click)="onCheckoutClick()" [disabled]="totalItems() === 0" appTrackClick="cart_checkout_click"
+        [trackPayload]="{ totalItems: totalItems(), totalAmount: totalAmount() }">
         Go to checkout
       </button>
 

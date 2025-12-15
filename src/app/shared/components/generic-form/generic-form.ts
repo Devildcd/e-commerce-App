@@ -28,7 +28,7 @@ export class GenericForm implements OnInit {
   // null hasta q se construya
   form: FormGroup | null = null;
 
-  constructor(private readonly fb: FormBuilder) {}
+  constructor(private readonly fb: FormBuilder) { }
 
   get fields(): FormFieldConfig[] {
     return this.config().fields;
