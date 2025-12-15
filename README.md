@@ -53,7 +53,31 @@ Small e-commerce frontend built with Angular 20 using a feature-based architectu
 
 The app is split by features, with shared UI and a small core layer for cross-cutting concerns.
 
-src/app ├── core/ │ ├── errors/ # Global error handler, error mapping utilities │ ├── guards/ # Route guards (auth, cart-not-empty, canDeactivate, etc.) │ ├── interceptors/ # HTTP interceptors (e.g. httpErrorInterceptor) │ ├── models/ # Domain models (Product, CartItem, etc.) │ ├── services/ # Infrastructure services (API clients, logging, notifications) │ ├── state/ # App-wide stores when needed (UiStore, etc.) │ └── utils/ # Helpers ├── features/ │ ├── auth/ # Auth feature (modal-based login, AuthStore) │ ├── cart/ # Cart feature (CartStore, pages, components) │ ├── catalog/ # Catalog feature (CatalogStore, pages, components) │ └── checkout/ # Checkout feature (CheckoutStore, pages, guards) ├── layout/ │ └── main-layout/ # Main layout shell (header, router outlet, footer) └── shared/ ├── components/ # Reusable components (footer, header pieces, etc.) ├── directives/ # Reusable directives ├── interfaces/ # Shared types/contracts ├── pipes/ # Pipes (e.g. shortDescription) └── ui/ # UI primitives (spinner, etc.)
+src/app/
+  core/
+    errors/        # Global error handler
+    guards/        # Route guards (auth, cart-not-empty, canDeactivate, etc.)
+    interceptors/  # HTTP interceptors (e.g. httpErrorInterceptor)
+    models/        # Domain models (Product, CartItem, etc.)
+    services/      # Infrastructure services (API clients, logging, notifications)
+    state/         # App-wide stores when needed (UiStore, etc.)
+    utils/         # Helpers
+
+  features/
+    auth/          # Auth feature (modal-based login)
+    cart/          # Cart feature (pages, components)
+    catalog/       # Catalog feature (pages, components)
+    checkout/      # Checkout feature (pages, services)
+
+  layout/
+    main-layout/   # Main layout shell (header, router outlet, footer)
+
+  shared/
+    components/    # Reusable components (footer, header pieces, etc.)
+    directives/    # Reusable directives
+    interfaces/    # Shared types/contracts
+    pipes/         # Pipes (e.g. shortDescription)
+    ui/            # UI primitives (spinner, etc.)
 
 ---
 
