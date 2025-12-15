@@ -9,11 +9,12 @@ import { GenericFormConfig } from '../../../../shared/interfaces/form-config.int
 import { GenericForm } from '../../../../shared/components/generic-form/generic-form';
 import { LoggingService } from '../../../../core/services/logging-service';
 import { CheckoutService } from '../../services/checkout-service';
+import { UiSpinner } from '../../../../shared/ui/ui-spinner/ui-spinner';
 
 
 @Component({
   selector: 'app-checkout-page',
-  imports: [GenericForm, CurrencyPipe],
+  imports: [GenericForm, CurrencyPipe, UiSpinner],
   templateUrl: './checkout-page.html',
   styleUrl: './checkout-page.scss',
 })
@@ -29,6 +30,9 @@ export class CheckoutPage {
   readonly items = this.cartStore.items;
   readonly totalItems = this.cartStore.totalItems;
   readonly totalAmount = this.cartStore.totalAmount;
+
+  // spiner
+  readonly isProcessing = this.checkoutStore.isProcessing;
 
   // generic form shipping
   readonly shippingFormConfig: GenericFormConfig = {
@@ -114,16 +118,30 @@ export class CheckoutPage {
 
   // pay metodos
    onPaymentSubmit(value: Record<string, unknown>): void {
+    if (this.isProcessing()) return; // guard
+
     const snapshot = this.cartStore.getSnapshot();
-    const ok = this.checkoutService.processPayment(snapshot, value);
 
-    if (!ok) {
+    this.checkoutStore.startPayment();
+    this.logger.info('Payment started', { feature: 'checkout' });
+
+    window.setTimeout(() => {
+      const ok = this.checkoutService.processPayment(snapshot, value);
+
+      if (!ok) {
+        this.checkoutStore.markPaymentError();
+        this.notifications.error('Payment failed. Try again.');
+        window.setTimeout(() => this.checkoutStore.reset(), 800);
+        return;
+      }
+
+      this.checkoutStore.markPaymentSuccess();
+      this.notifications.success('Purchase completed!');
+
+      this.cartStore.clear();
+      this.checkoutStore.reset();
       this.router.navigate(['/']);
-      return;
-    }
-
-    this.cartStore.clear();
-    this.router.navigate(['/']);
+    }, 2000);
   }
 
   onPaymentCancel(): void {

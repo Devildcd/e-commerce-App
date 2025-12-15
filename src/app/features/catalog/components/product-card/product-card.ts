@@ -26,9 +26,9 @@ export class ProductCard {
   viewDetails = output<number>();
 
   formattedPrice = computed(() =>
-    new Intl.NumberFormat('es-PE', {
+    new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'PEN',
+      currency: 'USD',
     }).format(this.price())
   );
 

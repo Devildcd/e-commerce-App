@@ -1,58 +1,38 @@
 <article
-  class="group relative overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/60 transition hover:-translate-y-0.5 hover:shadow-md"
->
+  class="group relative overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/60 transition hover:-translate-y-0.5 hover:shadow-md">
   <!-- Media -->
-  <div class="relative aspect-[4/3] max-h-[210px] bg-slate-50">
-    <img
-      [src]="image() || 'https://via.placeholder.com/400x300?text=Product'"
-      [alt]="title()"
-      class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-      loading="lazy"
-    />
+  <div class="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-slate-50">
+    <img [src]="image() || 'https://via.placeholder.com/400x300?text=Product'" [alt]="title()"
+      class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" loading="lazy" />
 
-    <!-- Heart (decorativo por ahora) -->
-    <button
-      type="button"
-      class="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200/70 backdrop-blur transition hover:bg-white"
-      aria-label="Add to favorites"
-    >
-      <span class="material-symbols-outlined text-[20px] text-slate-700">
-        favorite
-      </span>
+    <!-- Heart -->
+    <button type="button" class="absolute right-2 top-2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200/70 backdrop-blur transition hover:bg-white
+           sm:right-3 sm:top-3" aria-label="Add to favorites">
+      <span class="material-symbols-outlined text-[20px] text-slate-700">favorite</span>
     </button>
 
-    <!-- Acciones overlay (desktop) -->
-    <div
-      class="pointer-events-none absolute inset-x-3 bottom-3 flex gap-2 opacity-0 transition
-             group-hover:pointer-events-auto group-hover:opacity-100"
-    >
-      <button
-        type="button"
+    <!-- Acciones overlay (SOLO desktop) -->
+    <div class="pointer-events-none absolute inset-x-3 bottom-3 hidden translate-y-2 gap-2 opacity-0 transition
+           md:flex group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
+      <button type="button"
         class="inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-xl bg-white/95 px-3 text-sm font-medium text-slate-900 shadow-sm ring-1 ring-slate-200/70 backdrop-blur hover:bg-white"
-        (click)="onViewDetails()"
-      >
-        <span class="material-symbols-outlined text-[18px]">
-          visibility
-        </span>
+        (click)="onViewDetails()">
+        <span class="material-symbols-outlined text-[18px]">visibility</span>
         Details
       </button>
 
-      <button
-        type="button"
+      <button type="button"
         class="inline-flex h-9 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/20 hover:bg-slate-800"
-        aria-label="Add to cart"
-        (click)="onAddToCart()"
-      >
-        <span class="material-symbols-outlined text-[20px]">
-          add_shopping_cart
-        </span>
+        aria-label="Add to cart" (click)="onAddToCart()">
+        <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
       </button>
     </div>
   </div>
 
   <!-- Content -->
-  <div class="p-4 pt-3">
-    <h3 class="clamp-2 text-[13px] font-semibold leading-snug text-slate-900">
+  <div class="flex flex-1 flex-col p-4 pt-3">
+    <h3 class="line-clamp-2 min-h-[2.2rem] overflow-hidden text-ellipsis
+         text-[13px] font-semibold leading-snug text-slate-900" [attr.title]="title()" tabindex="0">
       {{ title() }}
     </h3>
 
@@ -77,19 +57,15 @@
 
       <!-- Acciones visibles en mobile -->
       <div class="flex gap-2 md:hidden">
-        <button
-          type="button"
+        <button type="button"
           class="inline-flex h-9 items-center justify-center rounded-xl bg-white px-3 text-sm font-medium text-slate-900 shadow-sm ring-1 ring-slate-200/70 hover:bg-slate-50"
-          (click)="onViewDetails()"
-        >
+          (click)="onViewDetails()">
           Detalles
         </button>
 
-        <button
-          type="button"
+        <button type="button"
           class="inline-flex h-9 items-center justify-center rounded-xl bg-slate-900 px-3 text-sm font-medium text-white shadow-sm hover:bg-slate-800"
-          (click)="onAddToCart()"
-        >
+          (click)="onAddToCart()">
           Añadir
         </button>
       </div>

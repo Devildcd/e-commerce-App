@@ -65,7 +65,6 @@ export class LoginModal {
     }
 
     this.authStore.loginWithCredentials(username, password);
-    this.router.navigate(["/checkout"]);
 
     this.close();
   }

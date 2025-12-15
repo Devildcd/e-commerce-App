@@ -39,28 +39,28 @@ export class NotificationService {
 
     if (error.isNetworkError) {
       message =
-        'No se pudo conectar con el servidor. Revisa tu conexión a internet.';
+        'Could not connect to the server. Please check your internet connection.';
     } else {
       switch (error.status) {
         case 400:
-          message = 'La petición no es válida. Revisa los datos e inténtalo de nuevo.';
+          message = 'The request is invalid. Please check the data and try again.';
           break;
         case 401:
-          message = 'Tu sesión ha expirado o no estás autenticado.';
+          message = 'Your session has expired or you are not authenticated.';
           break;
         case 403:
-          message = 'No tienes permisos para realizar esta acción.';
+          message = 'You do not have permission to perform this action.';
           break;
         case 404:
-          message = 'No encontramos el recurso que estás buscando.';
+          message = 'We could not find the resource you are looking for.';
           break;
         case 500:
-          message = 'Tuvimos un problema en el servidor. Inténtalo más tarde.';
+          message = 'We had a problem on the server. Please try again later.';
           break;
         default:
           if (!message) {
             message =
-              'Ocurrió un error inesperado. Inténtalo de nuevo en unos segundos.';
+              'An unexpected error occurred. Please try again in a few seconds.';
           }
           break;
       }

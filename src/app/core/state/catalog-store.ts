@@ -187,7 +187,7 @@ export const CatalogStore = signalStore(
           error: () => {
             patchState(store, {
               status: 'error',
-              errorMessage: 'No se pudo cargar el catálogo.',
+              errorMessage: 'The catalog could not be loaded.',
             });
           },
         });
