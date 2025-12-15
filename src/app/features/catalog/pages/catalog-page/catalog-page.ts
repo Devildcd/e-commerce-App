@@ -18,8 +18,11 @@ export class CatalogPage {
   private readonly catalogStore = inject(CatalogStore);
   private readonly cartStore = inject(CartStore);
 
-  readonly products = this.catalogStore.filteredProducts;
+  readonly products = this.catalogStore.currentPageProducts;
   readonly status = this.catalogStore.status;
+
+  readonly hasPrevPage = this.catalogStore.hasPrevPage;
+  readonly hasNextPage = this.catalogStore.hasNextPage;
 
   ngOnInit(): void {
     if (this.status() === 'idle') {
@@ -32,11 +35,17 @@ export class CatalogPage {
   }
 
   onAddToCart(product: Product): void {
-  this.cartStore.addProduct(product, 1);
-}
+    this.cartStore.addProduct(product, 1);
+  }
 
   onViewDetails(productId: number): void {
-    // aquí luego metes navegación a /product/:id
-    // this.router.navigate(['/product', productId]);
+  }
+
+   onPrevPage(): void {
+    this.catalogStore.prevPage();
+  }
+
+  onNextPage(): void {
+    this.catalogStore.nextPage();
   }
 }

@@ -27,60 +27,49 @@ export const ProductDetailsStore = signalStore(
     hasProduct: computed(() => !!store.product()),
   })),
 
-  withMethods(
-    (
-      store,
-      api = inject(ProductApiService),
-      catalog = inject(CatalogStore)
-    ) => ({
-      loadById(id: number): void {
-        // Si ya tengo no hago nada
-        const current = store.product();
-        if (current && current.id === id && store.status() === 'success') {
-          return;
-        }
+  withMethods((store, api = inject(ProductApiService)) => ({
+    loadById(id: number): void {
+      const current = store.product();
 
-        // probar desde el catalog, pa optimizar
-        const fromCatalog = catalog
-          .products()
-          .find((item) => item.id === id);
+      // si ya tengo el producto correcto y estoy en success, no hago nada
+      if (current && current.id === id && store.status() === 'success') {
+        return;
+      }
 
-        if (fromCatalog) {
+      patchState(store, {
+        status: 'loading',
+        errorMessage: null,
+        product: null,
+      });
+
+      api.getProductsById(id).subscribe({
+        next: (product) => {
           patchState(store, {
-            product: fromCatalog,
+            product,
             status: 'success',
             errorMessage: null,
           });
-          return;
-        }
+        },
+        error: () => {
+          patchState(store, {
+            status: 'error',
+            errorMessage: 'No se pudo cargar este producto.',
+          });
+        },
+      });
+    },
 
-        // Si no esta en catalog, si tengo q ir a la api
-        patchState(store, {
-          status: 'loading',
-          errorMessage: null,
-          product: null,
-        });
+    // para cuando quieras inyectar un Product ya obtenido (por ejemplo, del catalog)
+    setProduct(product: Product): void {
+      patchState(store, {
+        product,
+        status: 'success',
+        errorMessage: null,
+      });
+    },
 
-        api.getProductsById(id).subscribe({
-          next: (product) => {
-            patchState(store, {
-              product,
-              status: 'success',
-              errorMessage: null,
-            });
-          },
-          error: () => {
-            patchState(store, {
-              status: 'error',
-              errorMessage: 'No se pudo cargar este producto.',
-            });
-          },
-        });
-      },
-
-      clear(): void {
-        patchState(store, initialState);
-      },
-    })
-  )
+    clear(): void {
+      patchState(store, initialState);
+    },
+  }))
 );

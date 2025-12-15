@@ -8,19 +8,27 @@
       <h1 class="mt-1 text-3xl font-semibold tracking-tight text-slate-900">Catalog</h1>
     </div>
 
-    <!-- Paginador estático -->
+    <!-- Paginador -->
     <nav class="flex items-center gap-2" aria-label="Pagination">
-      <button type="button"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200/60 transition hover:bg-slate-50"
-        aria-label="Previous page">
+      <button
+        type="button"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200/60 transition hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+        aria-label="Previous page"
+        (click)="onPrevPage()"
+        [disabled]="!hasPrevPage()"
+      >
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
 
-      <button type="button"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200/60 transition hover:bg-slate-50"
-        aria-label="Next page">
+      <button
+        type="button"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200/60 transition hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+        aria-label="Next page"
+        (click)="onNextPage()"
+        [disabled]="!hasNextPage()"
+      >
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
