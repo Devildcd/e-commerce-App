@@ -1,9 +1,9 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
 
 import { LoggingService } from '../services/logging-service';
 import { NotificationService } from '../services/notification-service';
-import { catchError, throwError } from 'rxjs';
 
 import { ApiError } from '../models/domain/common.model';
 
@@ -15,8 +15,12 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: unknown) => {
       const normalized = mapToApiError(error, req.url);
 
-      // pa log, luego, recordar
-      logger.error('HTTP error', normalized);
+      logger.error('HTTP error', normalized, {
+        url: normalized.url ?? undefined,
+        status: normalized.status,
+        method: req.method,
+        feature: 'http-interceptor',
+      });
 
       notifications.showHttpError(normalized);
 
@@ -31,7 +35,7 @@ function mapToApiError(error: unknown, url: string): ApiError {
       return {
         status: 0,
         url,
-        message: 'No se pudo contactar con el servidor.',
+        message: 'The server could not be contacted.',
         isNetworkError: true,
         details: error.error,
       };
@@ -53,7 +57,7 @@ function mapToApiError(error: unknown, url: string): ApiError {
   return {
     status: -1,
     url,
-    message: 'Error inesperado procesando la petición.',
+    message: 'An unexpected error occurred while processing the request.',
     details: error,
   };
 }

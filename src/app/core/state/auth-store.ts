@@ -1,45 +1,87 @@
-import { inject } from "@angular/core";
-import { signalStore, withMethods, withState } from "@ngrx/signals";
-import { AuthService } from "../services/auth-service";
+import { computed, inject } from "@angular/core";
+import { patchState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
+import { NotificationService } from "../services/notification-service";
+import { LoggingService } from "../services/logging-service";
 
 export type AuthStatus = 'anonymous' | 'authenticating' | 'authenticated' | 'error';
 
 export interface AuthUser {
-  id: number;
   username: string;
-  email: string;
+  displayName: string;
+  initials: string;
 }
 
 export interface AuthState {
   user: AuthUser | null;
-  token: string | null;
-  status: AuthStatus;
-  errorMessage: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
-  token: null,
-  status: 'anonymous',
-  errorMessage: null,
 };
+
+function buildInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '';
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
 
 export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
 
-  withMethods((store, authService = inject(AuthService)) => ({
-    login(username: string, password: string): void {
-      // TODO: usar authService.login(...)
-    },
+  withComputed((store) => ({
+    isAuthenticated: computed(() => !!store.user()),
+    currentUser: computed(() => store.user()),
+    initials: computed(() => store.user()?.initials ?? ''),
+    displayName: computed(() => store.user()?.displayName ?? ''),
+  })),
 
-    logout(): void {
-      // TODO
-    },
+  withMethods((store, notifications = inject(NotificationService),
+    logger = inject(LoggingService)) => ({
+      loginWithCredentials(username: string, password: string): void {
+        const safeUser = username.trim();
+        if (!safeUser || !password) {
+          return;
+        }
 
-    // útil si algún día hidratas desde storage/token
-    setSession(user: AuthUser, token: string): void {
-      // TODO
-    },
-  }))
+        const displayName = safeUser;
+        const initials = buildInitials(displayName);
+
+        const user: AuthUser = {
+          username: safeUser,
+          displayName,
+          initials,
+        };
+
+        patchState(store, { user });
+
+        logger.event('login_success', {
+          username: safeUser,
+          feature: 'auth',
+        });
+
+        notifications.success(`Welcome, ${displayName}!`);
+      },
+
+      logout(): void {
+        const current = store.user();
+        if (!current) {
+          return;
+        }
+
+        patchState(store, { user: null });
+
+        logger.event('logout', {
+          username: current.username,
+          feature: 'auth',
+        });
+
+        notifications.info('Logged out successfully');
+      },
+    }))
 );

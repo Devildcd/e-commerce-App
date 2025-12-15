@@ -1,0 +1,81 @@
+@if (form) {
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+    <!-- Header -->
+    <header class="space-y-1">
+      <h2 class="text-lg font-semibold text-slate-900">
+        {{ config().title }}
+      </h2>
+
+      @if (config().description) {
+        <p class="text-sm text-slate-600">
+          {{ config().description }}
+        </p>
+      }
+    </header>
+
+    <!-- Campos -->
+    <div class="space-y-4">
+      @for (field of fields; track field.name) {
+        <div class="space-y-1">
+          <label
+            class="block text-xs font-medium uppercase tracking-wide text-slate-600"
+            [for]="field.name"
+          >
+            {{ field.label }}
+          </label>
+
+          <input
+            class="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 outline-none transition
+                   focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-900/10"
+            [id]="field.name"
+            [type]="field.type || 'text'"
+            [placeholder]="field.placeholder || ''"
+            [formControlName]="field.name"
+          />
+
+          <!-- errores -->
+          @if (hasError(field, 'required')) {
+            <p class="text-xs text-red-600 mt-0.5">
+              This field is required.
+            </p>
+          }
+
+          @if (hasError(field, 'minlength')) {
+            <p class="text-xs text-red-600 mt-0.5">
+              It must have at least {{ field.minLength }} characters.
+            </p>
+          }
+
+          @if (hasError(field, 'pattern') && field.patternErrorMessage) {
+            <p class="text-xs text-red-600 mt-0.5">
+              {{ field.patternErrorMessage }}
+            </p>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Botones -->
+    <footer
+      class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"
+    >
+      @if (config().secondaryButton) {
+        <button
+          type="button"
+          class="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          (click)="onCancel()"
+        >
+          {{ config().secondaryButton!.label }}
+        </button>
+      }
+
+      <button
+        type="submit"
+        [disabled]="form.invalid || form.pending"
+        class="inline-flex h-10 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {{ config().primaryButton.label }}
+      </button>
+    </footer>
+  </form>
+}

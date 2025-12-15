@@ -1,0 +1,17 @@
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm"
+    (click)="close()"
+  >
+    <div
+      class="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl ring-1 ring-slate-200/70"
+      (click)="$event.stopPropagation()"
+    >
+      <app-generic-form
+        [config]="formConfig"
+        (submitted)="onSubmitted($event)"
+        (cancelled)="onCancelled()"
+      />
+    </div>
+  </div>
+}
