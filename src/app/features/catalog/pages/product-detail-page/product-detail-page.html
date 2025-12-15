@@ -100,8 +100,22 @@
       </div>
 
       <p class="text-sm leading-relaxed text-slate-700">
-        {{ p.description }}
-      </p>
+  {{
+    isDescriptionExpanded() || !hasLongDescription()
+      ? p.description
+      : (p.description | shortDescription:220)
+  }}
+</p>
+
+@if (hasLongDescription()) {
+  <button
+    type="button"
+    class="mt-1 text-xs font-medium text-slate-600 hover:text-slate-900 underline underline-offset-2"
+    (click)="toggleDescription()"
+  >
+    {{ isDescriptionExpanded() ? 'Show less' : 'Show more' }}
+  </button>
+}
 
       <!-- Actions -->
       <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200/60">

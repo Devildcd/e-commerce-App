@@ -6,10 +6,11 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { ProductDetailsStore } from '../../../../core/state/product-details.store';
 import { CartStore } from '../../../../core/state/cart-store';
+import { ShortDescriptionPipe } from '../../../../shared/pipes/short-description-pipe';
 
 @Component({
   selector: 'app-product-detail-page',
-  imports: [CurrencyPipe, RouterLink],
+  imports: [CurrencyPipe, RouterLink, ShortDescriptionPipe],
   templateUrl: './product-detail-page.html',
   styleUrl: './product-detail-page.scss',
 })
@@ -21,17 +22,24 @@ export class ProductDetailPage {
 
   // signal local, OJO => revisar luego para q no rompa patron 
   private readonly _quantity = signal(1);
+  private readonly _descriptionExpanded = signal(false);
 
   // signals que vienen del store
   readonly product = this.detailsStore.product;
   readonly status = this.detailsStore.status;
 
   readonly quantity = this._quantity.asReadonly();
+  readonly isDescriptionExpanded = this._descriptionExpanded.asReadonly();
 
   readonly rating = computed(() => this.product()?.rating?.rate ?? null);
   readonly ratingCount = computed(
     () => this.product()?.rating?.count ?? null
   );
+
+  readonly hasLongDescription = computed(() => {
+    const desc = this.product()?.description ?? '';
+    return desc.length > 220;
+  });
 
   constructor() {
     this.route.paramMap
@@ -82,5 +90,9 @@ export class ProductDetailPage {
     }
 
     this.cartStore.addProduct(product, this._quantity());
+  }
+
+  toggleDescription(): void {
+    this._descriptionExpanded.update((v) => !v);
   }
 }
