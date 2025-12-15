@@ -1,6 +1,7 @@
 import { computed, inject } from "@angular/core";
 import { patchState, signalStore, withComputed, withMethods, withState } from "@ngrx/signals";
 import { NotificationService } from "../services/notification-service";
+import { LoggingService } from "../services/logging-service";
 
 export type AuthStatus = 'anonymous' | 'authenticating' | 'authenticated' | 'error';
 
@@ -40,34 +41,47 @@ export const AuthStore = signalStore(
     displayName: computed(() => store.user()?.displayName ?? ''),
   })),
 
-  withMethods((store, notifications = inject(NotificationService)) => ({
-    loginWithCredentials(username: string, password: string): void {
-      const safeUser = username.trim();
-      if (!safeUser || !password) {
-        return;
-      }
+  withMethods((store, notifications = inject(NotificationService),
+    logger = inject(LoggingService)) => ({
+      loginWithCredentials(username: string, password: string): void {
+        const safeUser = username.trim();
+        if (!safeUser || !password) {
+          return;
+        }
 
-      const displayName = safeUser;
-      const initials = buildInitials(displayName);
+        const displayName = safeUser;
+        const initials = buildInitials(displayName);
 
-      const user: AuthUser = {
-        username: safeUser,
-        displayName,
-        initials,
-      };
+        const user: AuthUser = {
+          username: safeUser,
+          displayName,
+          initials,
+        };
 
-      patchState(store, { user });
+        patchState(store, { user });
 
-      notifications.success(`Welcome, ${displayName}!`);
-    },
+        logger.event('login_success', {
+          username: safeUser,
+          feature: 'auth',
+        });
 
-    logout(): void {
-      if (!store.user()) {
-        return;
-      }
+        notifications.success(`Welcome, ${displayName}!`);
+      },
 
-      patchState(store, { user: null });
-      notifications.info('Log out sussessfuly');
-    },
-  }))
+      logout(): void {
+        const current = store.user();
+        if (!current) {
+          return;
+        }
+
+        patchState(store, { user: null });
+
+        logger.event('logout', {
+          username: current.username,
+          feature: 'auth',
+        });
+
+        notifications.info('Logged out successfully');
+      },
+    }))
 );

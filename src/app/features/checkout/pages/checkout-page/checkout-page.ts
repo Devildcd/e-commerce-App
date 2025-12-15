@@ -7,6 +7,8 @@ import { CheckoutStore } from '../../../../core/state/checkout.store';
 import { NotificationService } from '../../../../core/services/notification-service';
 import { GenericFormConfig } from '../../../../shared/interfaces/form-config.interface';
 import { GenericForm } from '../../../../shared/components/generic-form/generic-form';
+import { LoggingService } from '../../../../core/services/logging-service';
+import { CheckoutService } from '../../services/checkout-service';
 
 
 @Component({
@@ -21,6 +23,8 @@ export class CheckoutPage {
   private readonly checkoutStore = inject(CheckoutStore);
   private readonly notifications = inject(NotificationService);
   private readonly router = inject(Router);
+  private readonly logger = inject(LoggingService);
+  private readonly checkoutService = inject(CheckoutService);
 
   readonly items = this.cartStore.items;
   readonly totalItems = this.cartStore.totalItems;
@@ -97,6 +101,10 @@ export class CheckoutPage {
   // shipping mtodos
   onShippingSubmit(value: Record<string, unknown>): void {
     this.checkoutStore.saveShipping(value);
+
+    this.logger.info('Shipping data submitted', value, {
+      feature: 'checkout',
+    });
     this.notifications.info('Shipping information saved.');
   }
 
@@ -105,27 +113,16 @@ export class CheckoutPage {
   }
 
   // pay metodos
-  onPaymentSubmit(_value: Record<string, unknown>): void {
+   onPaymentSubmit(value: Record<string, unknown>): void {
     const snapshot = this.cartStore.getSnapshot();
+    const ok = this.checkoutService.processPayment(snapshot, value);
 
-    if (!snapshot.totalItems) {
-      this.notifications.error(
-        'Your shopping cart is empty. Please add products before checking out.'
-      );
+    if (!ok) {
       this.router.navigate(['/']);
       return;
     }
 
-    this.checkoutStore.startPayment();
-
-    this.notifications.success(
-      `Simulated payment made by ${snapshot.totalAmount.toFixed(
-        2
-      )} USD. Thank you for your purchase.`
-    );
-
     this.cartStore.clear();
-    this.checkoutStore.markPaymentSuccess();
     this.router.navigate(['/']);
   }
 

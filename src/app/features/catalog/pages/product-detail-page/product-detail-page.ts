@@ -7,10 +7,11 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProductDetailsStore } from '../../../../core/state/product-details.store';
 import { CartStore } from '../../../../core/state/cart-store';
 import { ShortDescriptionPipe } from '../../../../shared/pipes/short-description-pipe';
+import { TrackClick } from '../../../../shared/directives/track-click';
 
 @Component({
   selector: 'app-product-detail-page',
-  imports: [CurrencyPipe, RouterLink, ShortDescriptionPipe],
+  imports: [CurrencyPipe, RouterLink, ShortDescriptionPipe, TrackClick],
   templateUrl: './product-detail-page.html',
   styleUrl: './product-detail-page.scss',
 })

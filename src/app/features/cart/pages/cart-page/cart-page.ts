@@ -5,10 +5,11 @@ import { Router, RouterLink } from '@angular/router';
 import { CartItem, CartStore } from '../../../../core/state/cart-store';
 import { AuthStore } from '../../../../core/state/auth-store';
 import { AppStore } from '../../../../core/state/app-store';
+import { TrackClick } from '../../../../shared/directives/track-click';
 
 @Component({
   selector: 'app-cart-page',
-  imports: [CurrencyPipe, RouterLink],
+  imports: [CurrencyPipe, RouterLink, TrackClick],
   templateUrl: './cart-page.html',
   styleUrl: './cart-page.scss',
 })

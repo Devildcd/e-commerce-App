@@ -100,22 +100,20 @@
       </div>
 
       <p class="text-sm leading-relaxed text-slate-700">
-  {{
-    isDescriptionExpanded() || !hasLongDescription()
-      ? p.description
-      : (p.description | shortDescription:220)
-  }}
-</p>
+        {{
+        isDescriptionExpanded() || !hasLongDescription()
+        ? p.description
+        : (p.description | shortDescription:220)
+        }}
+      </p>
 
-@if (hasLongDescription()) {
-  <button
-    type="button"
-    class="mt-1 text-xs font-medium text-slate-600 hover:text-slate-900 underline underline-offset-2"
-    (click)="toggleDescription()"
-  >
-    {{ isDescriptionExpanded() ? 'Show less' : 'Show more' }}
-  </button>
-}
+      @if (hasLongDescription()) {
+      <button type="button"
+        class="mt-1 text-xs font-medium text-slate-600 hover:text-slate-900 underline underline-offset-2"
+        (click)="toggleDescription()">
+        {{ isDescriptionExpanded() ? 'Show less' : 'Show more' }}
+      </button>
+      }
 
       <!-- Actions -->
       <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200/60">
@@ -141,7 +139,7 @@
 
           <button type="button"
             class="inline-flex h-11 w-full items-center justify-center rounded-xl bg-slate-900 px-5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 sm:w-auto"
-            (click)="addToCart()">
+            (click)="addToCart()" appTrackClick="product_detail_add_to_cart" [trackPayload]="{ productId: p.id }">
             Add to cart
           </button>
         </div>
