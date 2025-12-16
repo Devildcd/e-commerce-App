@@ -22,7 +22,12 @@
       </button>
 
       <button type="button"
-        class="inline-flex h-9 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/20 hover:bg-slate-800"
+        class="inline-flex h-9 w-11 items-center justify-center rounded-xl
+         bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/20
+         transition-all duration-200 ease-out
+         hover:-translate-y-[1px] hover:bg-slate-800 hover:shadow-md
+         active:translate-y-0 active:scale-[0.96] active:shadow-sm
+         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         aria-label="Add to cart" (click)="onAddToCart()">
         <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
       </button>
@@ -60,13 +65,13 @@
         <button type="button"
           class="inline-flex h-9 items-center justify-center rounded-xl bg-white px-3 text-sm font-medium text-slate-900 shadow-sm ring-1 ring-slate-200/70 hover:bg-slate-50"
           (click)="onViewDetails()">
-          Detalles
+          Details
         </button>
 
         <button type="button"
           class="inline-flex h-9 items-center justify-center rounded-xl bg-slate-900 px-3 text-sm font-medium text-white shadow-sm hover:bg-slate-800"
           (click)="onAddToCart()">
-          Añadir
+          Add
         </button>
       </div>
     </div>
