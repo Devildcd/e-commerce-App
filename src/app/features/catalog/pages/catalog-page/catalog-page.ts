@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 
 import { ProductCard } from '../../components/product-card/product-card';
 import { CategoriesSection } from '../../components/categories-section/categories-section';
@@ -14,7 +14,7 @@ import { UiSpinner } from '../../../../shared/ui/ui-spinner/ui-spinner';
   templateUrl: './catalog-page.html',
   styleUrl: './catalog-page.scss',
 })
-export class CatalogPage {
+export class CatalogPage implements OnInit{
 
   private readonly catalogStore = inject(CatalogStore);
   private readonly cartStore = inject(CartStore);

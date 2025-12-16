@@ -94,18 +94,19 @@ export class Header {
   }
 
   //me controla si el buscador está activo según la ruta
-  private updateShowSearch(url: string): void {
-    const enabled = url === '/';
+ private updateShowSearch(url: string): void {
+  const tree = this.router.parseUrl(url);
+  const segments = tree.root.children['primary']?.segments ?? [];
+  const path = '/' + segments.map(s => s.path).join('/');
 
-    this.showSearch.set(enabled);
+  const enabled = path === '/';
 
-    // si salgo de '/', cierra y limpia
-    if (!enabled) {
-      this._mobileSearchOpen.set(false);
-      if (this.hasSearchTerm) {
-        this.searchControl.setValue('');
-      }
-    }
+  this.showSearch.set(enabled);
+
+  if (!enabled) {
+    this._mobileSearchOpen.set(false);
+    if (this.hasSearchTerm) this.searchControl.setValue('');
   }
+}
 }
 

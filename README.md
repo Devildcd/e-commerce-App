@@ -1,121 +1,91 @@
-# E-commerce App (Angular 20)
+# E-commerce App
 
-Small e-commerce frontend built with Angular 20 using a feature-based architecture, standalone components, and Signal Stores. The backend is simulated using Fake Store API.
+A small e-commerce storefront built with **Angular 20**.  
+It consumes the public **Fake Store API** as a demo backend: https://fakestoreapi.com/
 
-**Fake API:** <https://fakestoreapi.com/>
+## What you can do
 
-> **Note:** Auth is simulated and handled via a modal (there is no /login route). Protected routes redirect back to `/` and can optionally preserve a `returnUrl` query param.
+- Browse the product **catalog** (paginated — **8 items per page** by default)
+- Filter products by **category**
+- Search products from the header (**search is available only on the Catalog view**)
+- Add products to the cart (even while not logged in)
+- Access to **Cart** and **Checkout** is protected by route guards (login happens via a modal)
+- Complete a **simulated checkout** (Shipping + Payment forms + processing spinner)
 
----
+## Tech stack
 
-## 🚀 Features
+- Angular 20 (standalone components + modern template syntax)
+- NGRX Signal Stores for state management (Catalog, Cart, Auth, UI)
+- Tailwind CSS for styling
+- Centralized error handling:
+  - HTTP error interceptor (normalizes API errors + shows notifications)
+  - Global error handler (unexpected errors)
 
-### Catalog with
+## Demo backend
 
-* products fetch from Fake Store API
-* category filtering
-* search term filtering
-* pagination (client-side)
-* Product detail route (lazy-loaded)
+This project uses the Fake Store API for products and categories. Because it is an external demo service,
+data (including images) may load progressively depending on your network and their CDN.
 
-### Cart
+## Routes and navigation
 
-* add/remove items
-* update quantities
-* totals (items + amount)
-* cart dropdown (scrollable list + sticky subtotal/actions)
+- `/` — Catalog (home)
+- `/cart` — Cart (**requires login**)
+- `/checkout` — Checkout (**requires login + cart not empty**)
+- Login is handled through an in-app modal (no dedicated `/login` route)
 
-### Checkout
+### Guards (high level)
 
-* shipping + payment forms (simulated payment)
-* processing spinner during payment simulation
-* optional “pending changes” protection via `canDeactivate`
+- `authGuard` / `authMatchGuard`: blocks protected pages when the user is anonymous and redirects to `/`
+- `cartNotEmptyGuard`: blocks checkout when the cart has no items
+- `checkoutDeactivateGuard`: prevents losing progress while the checkout is processing or has data entered
 
-### Global UX
+## Project structure (overview)
 
-* sticky header
-* notifications/toasts (auto-dismiss)
-* logging service (dev-friendly)
+The app is split by **features**, with shared UI and a small **core** layer for cross-cutting concerns.
 
----
-
-## 🛠️ Tech Stack
-
-* Angular 20 (standalone + modern template control flow `@if`, `@for`)
-* `@ngrx/signals` (Signal Store pattern for state)
-* TailwindCSS + a bit of SCSS where needed
-* HTTP interceptors (global error normalization + notifications)
-* Guards: `canActivate`, `canMatch`, `canDeactivate`
-
----
-
-## 📂 Project Structure
-
-The app is split by features, with shared UI and a small core layer for cross-cutting concerns.
-
-src/app/
+```txt
+src/app
   core/
-    errors/        # Global error handler
-    guards/        # Route guards (auth, cart-not-empty, canDeactivate, etc.)
-    interceptors/  # HTTP interceptors (e.g. httpErrorInterceptor)
-    models/        # Domain models (Product, CartItem, etc.)
-    services/      # Infrastructure services (API clients, logging, notifications)
-    state/         # App-wide stores when needed (UiStore, etc.)
-    utils/         # Helpers
-
+    errors/          Global error handler
+    guards/          Route guards (auth, cart-not-empty, canDeactivate, etc.)
+    interceptors/    HTTP interceptors (e.g. httpErrorInterceptor)
+    models/          Domain models (Product, CartItem, etc.)
+    services/        Infrastructure services (API clients, logging, notifications)
+    state/           App-wide stores when needed (UiStore, etc.)
+    utils/           Small helpers
   features/
-    auth/          # Auth feature (modal-based login)
-    cart/          # Cart feature (pages, components)
-    catalog/       # Catalog feature (pages, components)
-    checkout/      # Checkout feature (pages, services)
-
+    auth/            Auth feature (modal-based login)
+    cart/            Cart feature (pages, components)
+    catalog/         Catalog feature (pages, components)
+    checkout/        Checkout feature (pages, services)
   layout/
-    main-layout/   # Main layout shell (header, router outlet, footer)
-
+    main-layout/     Layout shell (header, router-outlet, footer)
   shared/
-    components/    # Reusable components (footer, header pieces, etc.)
-    directives/    # Reusable directives
-    interfaces/    # Shared types/contracts
-    pipes/         # Pipes (e.g. shortDescription)
-    ui/            # UI primitives (spinner, etc.)
+    components/      Reusable components (footer, header pieces, etc.)
+    directives/      Shared directives
+    interfaces/      Shared contracts/types
+    pipes/           Shared pipes
+    ui/              UI primitives (spinner, etc.)
+```
 
----
+## Local development
 
-## 🧩 Architecture Notes
+```bash
+npm install
+npm start
+```
 
-* **Flow:** `UI components/pages` → `Stores` → `Services/API`
-* Pages/components do not call `HttpClient` directly.
-* Services deal with HTTP, mapping, and infrastructure concerns.
-* This keeps the UI clean and avoids “smart templates”.
+## Build
 
----
+```bash
+npm run build
+```
 
-## 🧭 Routing
+## Testing
 
-* Routes are lazy-loaded per feature. Sensitive routes are protected:
-  * `/cart` → requires auth
-  * `/checkout` → requires auth + cart not empty
-* Checkout uses `canDeactivate` to prevent leaving during processing / pending progress.
-* Because login is modal-based, guards redirect to `/` and can push a notification like “Please login to continue”.
+Not added yet (will be included later).
 
----
+## Notes
 
-## 🏃 Running Locally
-
-1. `npm install`
-2. `ng serve`
-
-Then open <http://localhost:4200>.
-
----
-
-## ⚙️ Environment / Assets
-
-* Static assets are served from `public/` (Angular modern approach).
-* Components use modern Angular metadata (`styleUrl`).
-
----
-
-## 📌 What’s Next (Planned)
-
-* Unit tests / component tests (not added yet)
+- Payments are simulated; no real transactions are performed and no sensitive data is stored.
+- Images come from the demo API and may load asynchronously depending on network conditions.

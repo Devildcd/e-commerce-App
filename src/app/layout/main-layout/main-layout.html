@@ -1,13 +1,12 @@
-<div class="min-h-screen bg-slate-50">
+<div class="min-h-screen bg-slate-50 flex flex-col [--app-header-h:64px]">
   <!-- Header global (fijo) -->
   <app-header class="fixed inset-x-0 top-0 z-50"></app-header>
 
   <app-notifications></app-notifications>
 
-  <!-- Contenido: reserva espacio del header -->
-  <main class="pt-16">
+  <main class="flex-1 pt-[var(--app-header-h)]">
     <!-- Wrapper global para alinear TODO -->
-    <div class="mx-auto max-w-6xl px-4 py-6">
+    <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
       <router-outlet></router-outlet>
     </div>
   </main>
