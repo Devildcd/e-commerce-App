@@ -25,6 +25,7 @@ export class CatalogPage implements OnInit{
 
   readonly hasPrevPage = this.catalogStore.hasPrevPage;
   readonly hasNextPage = this.catalogStore.hasNextPage;
+  readonly safePageIndex = this.catalogStore.safePageIndex;
 
   // spiner
   readonly isLoading = computed(() => this.status() === 'loading');

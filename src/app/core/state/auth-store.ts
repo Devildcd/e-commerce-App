@@ -42,8 +42,6 @@ export const AuthStore = signalStore(
     isAuthenticated: computed(() => store.status() === 'authenticated' && store.user() !== null),
     initials: computed(() => store.user()?.initials ?? ''),
     displayName: computed(() => store.user()?.displayName ?? ''),
-    status: computed(() => store.status()),
-    errorMessage: computed(() => store.errorMessage()),
   })),
 
   withMethods(
