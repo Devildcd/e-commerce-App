@@ -1,15 +1,20 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-card',
-  imports: [],
+  imports: [ NgOptimizedImage ],
   templateUrl: './product-card.html',
   styleUrl: './product-card.scss',
 })
 export class ProductCard {
 
   private readonly router = inject(Router);
+
+  private readonly _imageLoaded = signal(false);
+  readonly imageLoaded = this._imageLoaded.asReadonly();
+  readonly priority = input(false);
 
   // datos que vienen del container
   title = input.required<string>();
@@ -44,5 +49,13 @@ export class ProductCard {
   onViewDetails(): void {
     this.viewDetails.emit(this.productId());
     this.router.navigate(["/product", this.productId()]);
+  }
+
+  onImgLoad(): void {
+    this._imageLoaded.set(true);
+  }
+
+  onImgError(): void {
+    this._imageLoaded.set(true);
   }
 }

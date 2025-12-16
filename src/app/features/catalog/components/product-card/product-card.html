@@ -1,19 +1,44 @@
 <article
   class="group relative overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/60 transition hover:-translate-y-0.5 hover:shadow-md">
+
   <!-- Media -->
-  <div class="relative aspect-[4/3] overflow-hidden rounded-t-2xl bg-slate-50">
-    <img [src]="image() || 'https://via.placeholder.com/400x300?text=Product'" [alt]="title()"
-      class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" loading="lazy" />
+  <div class="relative aspect-square w-full overflow-hidden rounded-xl bg-slate-100">
+    <!-- Skeleton / shimmer -->
+    @if (!imageLoaded()) {
+      <div class="absolute inset-0">
+        <div class="h-full w-full bg-slate-200"></div>
+        <div
+          class="absolute inset-0 -translate-x-full animate-[shimmer_1.2s_infinite] bg-gradient-to-r
+                 from-transparent via-white/60 to-transparent">
+        </div>
+      </div>
+    }
+
+    <img
+      [ngSrc]="image() || 'https://via.placeholder.com/400x300?text=Product'"
+      [alt]="title()"
+      fill
+      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+      class="object-cover transition duration-300 group-hover:scale-[1.03]
+             transition-opacity duration-300"
+      [class.opacity-0]="!imageLoaded()"
+      [class.opacity-100]="imageLoaded()"
+      (load)="onImgLoad()"
+      (error)="onImgError()"
+       [priority]="priority()"
+    />
 
     <!-- Heart -->
-    <button type="button" class="absolute right-2 top-2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200/70 backdrop-blur transition hover:bg-white
-           sm:right-3 sm:top-3" aria-label="Add to favorites">
+    <button type="button"
+      class="absolute right-2 top-2 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm ring-1 ring-slate-200/70 backdrop-blur transition hover:bg-white
+             sm:right-3 sm:top-3"
+      aria-label="Add to favorites">
       <span class="material-symbols-outlined text-[20px] text-slate-700">favorite</span>
     </button>
 
     <!-- Acciones overlay (SOLO desktop) -->
     <div class="pointer-events-none absolute inset-x-3 bottom-3 hidden translate-y-2 gap-2 opacity-0 transition
-           md:flex group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
+                md:flex group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
       <button type="button"
         class="inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-xl bg-white/95 px-3 text-sm font-medium text-slate-900 shadow-sm ring-1 ring-slate-200/70 backdrop-blur hover:bg-white"
         (click)="onViewDetails()">
@@ -23,12 +48,13 @@
 
       <button type="button"
         class="inline-flex h-9 w-11 items-center justify-center rounded-xl
-         bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/20
-         transition-all duration-200 ease-out
-         hover:-translate-y-[1px] hover:bg-slate-800 hover:shadow-md
-         active:translate-y-0 active:scale-[0.96] active:shadow-sm
-         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-        aria-label="Add to cart" (click)="onAddToCart()">
+               bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/20
+               transition-all duration-200 ease-out
+               hover:-translate-y-[1px] hover:bg-slate-800 hover:shadow-md
+               active:translate-y-0 active:scale-[0.96] active:shadow-sm
+               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        aria-label="Add to cart"
+        (click)="onAddToCart()">
         <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
       </button>
     </div>
@@ -37,18 +63,15 @@
   <!-- Content -->
   <div class="flex flex-1 flex-col p-4 pt-3">
     <h3 class="line-clamp-2 min-h-[2.2rem] overflow-hidden text-ellipsis
-         text-[13px] font-semibold leading-snug text-slate-900" [attr.title]="title()" tabindex="0">
+               text-[13px] font-semibold leading-snug text-slate-900"
+        [attr.title]="title()" tabindex="0">
       {{ title() }}
     </h3>
 
     <div class="mt-2 flex items-center gap-2 text-xs text-slate-600">
       <span class="inline-flex items-center gap-1">
-        <span class="material-symbols-outlined text-[18px] text-amber-500">
-          star
-        </span>
-        <span class="font-medium text-slate-800">
-          {{ displayRating() }}
-        </span>
+        <span class="material-symbols-outlined text-[18px] text-amber-500">star</span>
+        <span class="font-medium text-slate-800">{{ displayRating() }}</span>
       </span>
 
       <span class="h-1 w-1 rounded-full bg-slate-300"></span>

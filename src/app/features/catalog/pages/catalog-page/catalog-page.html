@@ -72,6 +72,7 @@
         <app-product-card
           [title]="p.title"
           [description]="p.description"
+          [priority]="$index < 4 && safePageIndex() === 0"
           [price]="p.price"
           [image]="p.image"
           [productId]="p.id"
