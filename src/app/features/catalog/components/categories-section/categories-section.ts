@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { CatalogStore } from '../../../../core/state/catalog-store';
 
@@ -10,7 +9,7 @@ type UiCategory = {
 
 @Component({
   selector: 'app-categories-section',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './categories-section.html',
   styleUrl: './categories-section.scss',
 })

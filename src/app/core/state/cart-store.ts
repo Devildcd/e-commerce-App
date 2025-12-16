@@ -9,6 +9,12 @@ export interface CartItem {
   unitPrice: number;
 }
 
+export interface CartSnapshot {
+  items: CartItem[];
+  totalItems: number;
+  totalAmount: number;
+}
+
 export interface CartState {
   items: CartItem[];
 }
@@ -16,6 +22,11 @@ export interface CartState {
 const initialState: CartState = {
   items: [],
 };
+
+// helper pa clone
+function cloneItems(items: readonly CartItem[]): CartItem[] {
+  return items.map(i => ({ ...i, product: { ...i.product } }));
+}
 
 export const CartStore = signalStore(
   { providedIn: 'root' },
@@ -65,9 +76,9 @@ export const CartStore = signalStore(
         next = items.map((item, i) =>
           i === index
             ? {
-                ...item,
-                quantity: item.quantity + safeQuantity,
-              }
+              ...item,
+              quantity: item.quantity + safeQuantity,
+            }
             : item
         );
       }

@@ -1,17 +1,17 @@
 import { computed, inject } from '@angular/core';
 import {
+  patchState,
   signalStore,
-  withState,
   withComputed,
   withMethods,
-  patchState,
+  withState,
 } from '@ngrx/signals';
-
-import { forkJoin } from 'rxjs';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { tapResponse } from '@ngrx/operators';
+import { exhaustMap, forkJoin, pipe, tap } from 'rxjs';
 
 import { ProductApiService } from '../services/product-api-service';
 import { Product } from '../models/domain/product.model';
-
 
 type LoadStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -38,26 +38,22 @@ const initialState: CatalogState = {
   pageSize: 8,
 };
 
-// helper para filtrar productos
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
 function filterProducts(
-  products: Product[],
+  products: readonly Product[],
   category: string | null,
   searchTerm: string
 ): Product[] {
-  if (!products.length) {
-    return [];
-  }
+  if (!products.length) return [];
 
   const term = searchTerm.trim().toLowerCase();
 
   return products.filter((product) => {
-    if (category && product.category !== category) {
-      return false;
-    }
-
-    if (!term) {
-      return true;
-    }
+    if (category && product.category !== category) return false;
+    if (!term) return true;
 
     const text = `${product.title} ${product.description}`.toLowerCase();
     return text.includes(term);
@@ -70,60 +66,41 @@ export const CatalogStore = signalStore(
 
   withComputed((store) => {
     const filteredProducts = computed(() =>
-      filterProducts(
-        store.products(),
-        store.selectedCategory(),
-        store.searchTerm()
-      )
+      filterProducts(store.products(), store.selectedCategory(), store.searchTerm())
     );
 
+    const filteredCount = computed(() => filteredProducts().length);
+
     const totalPages = computed(() => {
-      const items = filteredProducts();
       const size = store.pageSize();
-
-      if (!items.length || size <= 0) {
-        return 1;
-      }
-
-      return Math.ceil(items.length / size);
+      const count = filteredCount();
+      if (size <= 0) return 1;
+      return Math.max(1, Math.ceil(count / size));
     });
 
-    // productos de la página actual
+    const safePageIndex = computed(() => clamp(store.pageIndex(), 0, totalPages() - 1));
+
     const currentPageProducts = computed(() => {
       const items = filteredProducts();
       const size = store.pageSize();
+      if (!items.length || size <= 0) return [];
 
-      if (!items.length || size <= 0) {
-        return [];
-      }
-
-      const total = totalPages();
-      const rawIndex = store.pageIndex();
-      const safeIndex = Math.min(Math.max(rawIndex, 0), total - 1);
-
-      const start = safeIndex * size;
-      const end = start + size;
-
-      return items.slice(start, end);
+      const start = safePageIndex() * size;
+      return items.slice(start, start + size);
     });
 
-    const hasPrevPage = computed(() => store.pageIndex() > 0);
+    const hasPrevPage = computed(() => safePageIndex() > 0);
 
     const hasNextPage = computed(() => {
-      const items = filteredProducts();
-      const size = store.pageSize();
-
-      if (!items.length || size <= 0) {
-        return false;
-      }
-
-      const total = totalPages();
-      return store.pageIndex() < total - 1;
+      if (filteredCount() === 0) return false;
+      return safePageIndex() < totalPages() - 1;
     });
 
     return {
       filteredProducts,
+      filteredCount,
       totalPages,
+      safePageIndex,
       currentPageProducts,
       hasPrevPage,
       hasNextPage,
@@ -131,129 +108,95 @@ export const CatalogStore = signalStore(
   }),
 
   withMethods((store, api = inject(ProductApiService)) => {
-    const getFilteredCount = (): number =>
-      filterProducts(
-        store.products(),
-        store.selectedCategory(),
-        store.searchTerm()
-      ).length;
+    const clampToPages = (desired: number): number =>
+      clamp(desired, 0, store.totalPages() - 1);
 
-    const clampPageIndex = (desired: number): number => {
-      const size = store.pageSize();
-      const totalItems = getFilteredCount();
+    const validateCategory = (categories: string[], current: string | null) =>
+      current && categories.includes(current) ? current : null;
 
-      if (!totalItems || size <= 0) {
-        return 0;
-      }
+    const loadCatalog = rxMethod<void>(
+      pipe(
+        tap(() => {
+          patchState(store, { status: 'loading', errorMessage: null });
+        }),
+        exhaustMap(() =>
+          forkJoin({
+            products: api.getAllProducts(),
+            categories: api.getAllCategories(),
+          }).pipe(
+            tapResponse({
+              next: ({ products, categories }) => {
+                patchState(store, {
+                  products,
+                  categories,
+                  selectedCategory: validateCategory(categories, store.selectedCategory()),
+                  status: 'success',
+                  errorMessage: null,
+                  pageIndex: 0,
+                });
+              },
+              error: () => {
+                patchState(store, {
+                  status: 'error',
+                  errorMessage: 'The catalog could not be loaded.',
+                });
+              },
+            })
+          )
+        )
+      )
+    );
 
-      const totalPages = Math.ceil(totalItems / size);
-      const min = 0;
-      const max = totalPages - 1;
-
-      return Math.min(Math.max(desired, min), max);
-    };
+    const reloadCategories = rxMethod<void>(
+      pipe(
+        exhaustMap(() =>
+          api.getAllCategories().pipe(
+            tapResponse({
+              next: (categories) => {
+                patchState(store, {
+                  categories,
+                  selectedCategory: validateCategory(categories, store.selectedCategory()),
+                  pageIndex: clampToPages(0),
+                });
+              },
+              error: () => {
+                if (!store.errorMessage()) {
+                  patchState(store, {
+                    errorMessage: 'The categories could not be updated.',
+                  });
+                }
+              },
+            })
+          )
+        )
+      )
+    );
 
     return {
-      loadCatalog(): void {
-        if (store.status() === 'loading') {
-          return;
-        }
+      loadCatalog,
+      reloadCategories,
 
-        patchState(store, {
-          status: 'loading',
-          errorMessage: null,
-        });
-
-        forkJoin({
-          products: api.getAllProducts(),
-          categories: api.getAllCategories(),
-        }).subscribe({
-          next: ({ products, categories }) => {
-            const currentCategory = store.selectedCategory();
-            const validCategory =
-              currentCategory && categories.includes(currentCategory)
-                ? currentCategory
-                : null;
-
-            patchState(store, {
-              products,
-              categories,
-              selectedCategory: validCategory,
-              status: 'success',
-              errorMessage: null,
-              pageIndex: 0,
-            });
-          },
-          error: () => {
-            patchState(store, {
-              status: 'error',
-              errorMessage: 'The catalog could not be loaded.',
-            });
-          },
-        });
-      },
-
-      reloadCategories(): void {
-        api.getAllCategories().subscribe({
-          next: (categories) => {
-            const currentCategory = store.selectedCategory();
-            const validCategory =
-              currentCategory && categories.includes(currentCategory)
-                ? currentCategory
-                : null;
-
-            patchState(store, {
-              categories,
-              selectedCategory: validCategory,
-              pageIndex: 0,
-            });
-          },
-          error: () => {
-            if (!store.errorMessage()) {
-              patchState(store, {
-                errorMessage: 'No se pudieron actualizar las categorías.',
-              });
-            }
-          },
-        });
-      },
-
-      setSearchTerm(term: string): void {
-        patchState(store, {
-          searchTerm: term?.trim() ?? '',
-          pageIndex: 0,
-        });
+      setSearchTerm(term: string | null | undefined): void {
+        patchState(store, { searchTerm: (term ?? '').trim(), pageIndex: 0 });
       },
 
       setSelectedCategory(category: string | null): void {
         const normalized = category || null;
+        if (normalized && !store.categories().includes(normalized)) return;
 
-        if (normalized && !store.categories().includes(normalized)) {
-          return;
-        }
-
-        patchState(store, {
-          selectedCategory: normalized,
-          pageIndex: 0,
-        });
+        patchState(store, { selectedCategory: normalized, pageIndex: 0 });
       },
 
       goToPage(index: number): void {
-        patchState(store, {
-          pageIndex: clampPageIndex(index),
-        });
+        patchState(store, { pageIndex: clampToPages(index) });
       },
 
       nextPage(): void {
-        patchState(store, {
-          pageIndex: clampPageIndex(store.pageIndex() + 1),
-        });
+        patchState(store, { pageIndex: clampToPages(store.safePageIndex() + 1) });
       },
 
       prevPage(): void {
-        patchState(store, {
-          pageIndex: clampPageIndex(store.pageIndex() - 1),
-        });
+        patchState(store, { pageIndex: clampToPages(store.safePageIndex() - 1) });
       },
     };
   })

@@ -31,6 +31,7 @@
     "@angular/platform-server": "^20.3.0",
     "@angular/router": "^20.3.0",
     "@angular/ssr": "^20.3.13",
+    "@ngrx/operators": "^20.1.0",
     "@ngrx/signals": "^20.1.0",
     "@tailwindcss/postcss": "^4.1.17",
     "express": "^5.1.0",
